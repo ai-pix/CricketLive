@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cricket Live — Pro Broadcast Scoreboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,700;1,800&family=Inter:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css?v=6" />
+</head>
+<body>
+  <main class="stage">
+    <!-- 16:9 Broadcast Frame -->
+    <section class="broadcast-frame" id="broadcastFrame" aria-label="Cricket Live Scoreboard">
+      <!-- Cinematic Night-Stadium Broadcast Backdrop -->
+      <div class="stadium-bg" aria-hidden="true">
+        <div class="arena-glow arena-glow-left"></div>
+        <div class="arena-glow arena-glow-right"></div>
+        <div class="arena-turf"></div>
+        <div class="arena-grid"></div>
+        <div class="arena-vignette"></div>
+      </div>
+
+      <!-- TOP HEADER SCOREBOARD -->
+      <header class="top-scoreboard">
+        <!-- Left Flag -->
+        <div class="flag-wing flag-left" aria-hidden="true">
+          <div class="flag-dynamic"></div>
+          <div class="flag-wave-sheen"></div>
+        </div>
+
+        <!-- Left Batting Team Panel -->
+        <div class="team-panel team-batting">
+          <div class="team-panel-inner">
+            <div class="team-name">BAN</div>
+            <div class="team-score" id="teamScore">139/4</div>
+            <div class="team-overs">
+              <span class="label">OVERS</span>
+              <span class="value" id="teamOvers">34.4</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Event / Status Callout -->
+        <div class="center-callout">
+          <div class="center-flare"></div>
+          <div class="live-pill">
+            <span class="live-dot"></span>
+            <span>LIVE BROADCAST</span>
+          </div>
+          <div class="callout-brackets">
+            <span class="bracket bracket-left"></span>
+            <div class="callout-text" id="calloutText">STRIKE ROTATED</div>
+            <span class="bracket bracket-right"></span>
+          </div>
+        </div>
+
+        <!-- Right Bowling Team Panel -->
+        <div class="team-panel team-bowling">
+          <div class="team-panel-inner">
+            <div class="team-name">SA</div>
+            <div class="team-role">BOWLING</div>
+          </div>
+        </div>
+
+        <!-- Right Flag -->
+        <div class="flag-wing flag-right" aria-hidden="true">
+          <div class="flag-dynamic"></div>
+          <div class="flag-wave-sheen"></div>
+        </div>
+      </header>
+
+      <!-- SUB-HEADER STATS STRIP -->
+      <div class="stats-strip">
+        <div class="stats-left">
+          <span class="stat-item"><span class="stat-key">P'SHIP</span> <strong>28(25)</strong></span>
+          <span class="stat-sep"></span>
+          <span class="stat-item"><span class="stat-key">CRR</span> <strong>3.69</strong></span>
+        </div>
+        <div class="stats-right">
+          <span class="stat-item"><span class="stat-key">LAST 5 OV</span> <strong>24/2</strong></span>
+        </div>
+      </div>
+
+      <!-- OVER-BY-OVER BALL TRACKER -->
+      <div class="overs-bar">
+        <div class="over-group">
+          <div class="over-label">
+            <span>OV</span>
+            <strong>34</strong>
+          </div>
+          <div class="balls-row">
+            <span class="ball ball-dot">0</span>
+            <span class="ball ball-dot">0</span>
+            <span class="ball ball-dot">0</span>
+            <span class="ball ball-run">1</span>
+            <span class="ball ball-dot">0</span>
+            <span class="ball ball-dot">0</span>
+          </div>
+          <div class="over-total">= 1</div>
+        </div>
+
+        <div class="over-divider"></div>
+
+        <div class="over-group">
+          <div class="over-label">
+            <span>OV</span>
+            <strong>35</strong>
+          </div>
+          <div class="balls-row">
+            <span class="ball ball-run">1</span>
+            <span class="ball ball-run">1lb</span>
+            <span class="ball ball-wicket">W</span>
+            <span class="ball ball-dot ball-active">0</span>
+            <span class="ball ball-live" title="Next delivery">
+              <span class="seam"></span>
+            </span>
+          </div>
+          <div class="over-total">= 2</div>
+        </div>
+      </div>
+
+      <!-- SPACER -->
+      <div class="stadium-spacer"></div>
+
+      <!-- BOTTOM PLAYER CARDS -->
+      <section class="players-grid" aria-label="Active Players">
+        <!-- NON-STRIKER -->
+        <article class="player-card card-batting">
+          <div class="card-header">
+            <span class="role-pill">NON-STRIKER</span>
+            <span class="mini-flag"></span>
+          </div>
+          <div class="card-body">
+            <div class="player-crest" aria-hidden="true">
+              <span class="crest-initials">NS</span>
+            </div>
+            <div class="player-info">
+              <h2 class="player-name">NAJMUL HOSSAIN SHANTO</h2>
+              <div class="player-main-stat">
+                <span class="big-num">12</span>
+                <span class="sub-num">(59)</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>4s <strong>1</strong></span>
+            <span>6s <strong>0</strong></span>
+            <span>SR <strong>20.34</strong></span>
+          </div>
+        </article>
+
+        <!-- STRIKER -->
+        <article class="player-card card-batting card-striker">
+          <div class="card-header">
+            <span class="role-pill role-striker">
+              <span class="strike-chevron">▶</span> STRIKER
+            </span>
+            <span class="mini-flag"></span>
+          </div>
+          <div class="card-body">
+            <div class="player-crest crest-striker" aria-hidden="true">
+              <span class="crest-initials">LD</span>
+            </div>
+            <div class="player-info">
+              <h2 class="player-name">LITTON DAS</h2>
+              <div class="player-main-stat">
+                <span class="big-num">0</span>
+                <span class="sub-num">(1)</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>4s <strong>0</strong></span>
+            <span>6s <strong>0</strong></span>
+            <span>SR <strong>0.00</strong></span>
+          </div>
+        </article>
+
+        <!-- BOWLER -->
+        <article class="player-card card-bowling">
+          <div class="card-header">
+            <span class="role-pill">BOWLER</span>
+            <span class="mini-flag"></span>
+          </div>
+          <div class="card-body">
+            <div class="player-crest crest-bowler" aria-hidden="true">
+              <span class="crest-initials">KR</span>
+            </div>
+            <div class="player-info">
+              <h2 class="player-name">KAGISO RABADA</h2>
+              <div class="player-main-stat">
+                <span class="big-num">1-28</span>
+                <span class="sub-num">(7.4)</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>ECON <strong>3.65</strong></span>
+            <span class="live-ball-mini" aria-hidden="true"></span>
+          </div>
+        </article>
+      </section>
+
+      <!-- BOTTOM TICKER BAR -->
+      <footer class="ticker-bar">
+        <div class="ticker-tag tag-wicket">
+          <span>LAST WKT: AFTAB ALAM SHAH • 2(7)</span>
+        </div>
+        <div class="ticker-viewport">
+          <div class="ticker-track">
+            <span>LIVE MATCH FEED</span>
+            <span class="dot">•</span>
+            <span>BALL-BY-BALL TELEMETRY ACTIVE</span>
+            <span class="dot">•</span>
+            <span>LIKE • SHARE • SUBSCRIBE</span>
+            <span class="dot">•</span>
+            <span>LIVE MATCH FEED</span>
+            <span class="dot">•</span>
+            <span>BALL-BY-BALL TELEMETRY ACTIVE</span>
+            <span class="dot">•</span>
+            <span>LIKE • SHARE • SUBSCRIBE</span>
+          </div>
+        </div>
+        <div class="ticker-tag tag-yet">
+          <span>YET TO BAT</span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- Demo Controls (Outside Broadcast Frame) -->
+    <div class="demo-controls" aria-label="Broadcast Animation Controls">
+      <span class="demo-label">Event Trigger:</span>
+      <button type="button" class="demo-btn active" data-event="STRIKE ROTATED" data-tone="neutral">Strike Rotated</button>
+      <button type="button" class="demo-btn" data-event="FOUR!" data-tone="four">4 Runs</button>
+      <button type="button" class="demo-btn" data-event="SIX!" data-tone="six">6 Runs</button>
+      <button type="button" class="demo-btn" data-event="WICKET!" data-tone="wicket">Wicket</button>
+      <button type="button" class="demo-btn" id="toggleTransparent">OBS Transparent BG</button>
+    </div>
+  </main>
+
+  <script src="app.js?v=6"></script>
+</body>
+</html>

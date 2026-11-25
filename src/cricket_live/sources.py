@@ -182,6 +182,14 @@ async def run_playwright_reader(
                         .slice(-2)
                         .map((e) => e.innerText.trim().replace(/\\s+/g, " "))
                         .join("||"),
+                    commentary: (() => {
+                        const cards = Array.from(document.querySelectorAll(".cm-b-roundcard"));
+                        for (const c of cards) {
+                            const t = (c.innerText || "").trim().replace(/\\s+/g, " ");
+                            if (t.length > 28) return t;
+                        }
+                        return "";
+                    })(),
                 };
             }""",
             selectors,
@@ -318,6 +326,11 @@ async def run_playwright_reader(
                 state.curr_over = parsed_overs[-1]
                 changed = True
 
+        comm_text = snap.get("commentary", "")
+        if comm_text and comm_text != state.live_commentary:
+            state.live_commentary = comm_text
+            changed = True
+
         return changed
 
     async with async_playwright() as pw:
@@ -331,6 +344,14 @@ async def run_playwright_reader(
 
         try:
             await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+
+            # Switch crex.com commentary to Hindi if the language button is present
+            try:
+                hindi_btn = page.locator("text=हिन्दी").first
+                if await hindi_btn.count() > 0:
+                    await hindi_btn.click(timeout=2500)
+            except Exception:
+                pass
 
             # Watch live DOM mutations in-place so the page never needs to reload
             await page.evaluate(
@@ -363,6 +384,14 @@ async def run_playwright_reader(
                                 .slice(-2)
                                 .map((e) => e.innerText.trim().replace(/\\s+/g, " "))
                                 .join("||"),
+                            commentary: (() => {
+                                const cards = Array.from(document.querySelectorAll(".cm-b-roundcard"));
+                                for (const c of cards) {
+                                    const t = (c.innerText || "").trim().replace(/\\s+/g, " ");
+                                    if (t.length > 28) return t;
+                                }
+                                return "";
+                            })(),
                         });
                     };
                     const observer = new MutationObserver(() => {

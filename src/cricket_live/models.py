@@ -72,6 +72,7 @@ class ScoreboardState(BaseModel):
         )
     )
     last_wicket: str = "AFTAB ALAM SHAH • 2(7)"
+    live_commentary: str = ""
     ticker_items: list[str] = Field(
         default_factory=lambda: [
             "HARSHIT RANA 1-28 (5.4)",

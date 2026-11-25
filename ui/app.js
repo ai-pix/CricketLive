@@ -1,7 +1,31 @@
 const calloutText = document.getElementById("calloutText");
 const broadcastFrame = document.getElementById("broadcastFrame");
 const toggleTransparentBtn = document.getElementById("toggleTransparent");
+const toggleCommentaryBtn = document.getElementById("toggleCommentary");
 const eventButtons = document.querySelectorAll(".demo-btn[data-event]");
+
+let commentaryEnabled = false;
+const audioQueue = [];
+let isPlayingAudio = false;
+
+function playNextAudio() {
+  if (isPlayingAudio || audioQueue.length === 0) return;
+  const item = audioQueue.shift();
+  const url = typeof item === "string" ? item : item.url;
+  const pauseAfterMs = typeof item === "object" && item.pauseMs ? item.pauseMs : 450;
+
+  isPlayingAudio = true;
+  const audio = new Audio(url);
+  const finish = () => {
+    setTimeout(() => {
+      isPlayingAudio = false;
+      playNextAudio();
+    }, pauseAfterMs);
+  };
+  audio.addEventListener("ended", finish);
+  audio.addEventListener("error", finish);
+  audio.play().catch(finish);
+}
 
 const teamScoreEl = document.getElementById("teamScore");
 const teamOversEl = document.getElementById("teamOvers");
@@ -203,7 +227,17 @@ function connectWebSocket() {
   const ws = new WebSocket(`${wsProto}//${location.host}/ws`);
   ws.addEventListener("message", (ev) => {
     try {
-      applyLiveState(JSON.parse(ev.data));
+      const payload = JSON.parse(ev.data);
+      if (payload.type === "commentary") {
+        console.log(`[${payload.speaker || "host"}]`, payload.text);
+        if (commentaryEnabled && payload.audio_url) {
+          const pauseMs = payload.speaker === "host" ? 420 : 850;
+          audioQueue.push({ url: payload.audio_url, pauseMs });
+          playNextAudio();
+        }
+        return;
+      }
+      applyLiveState(payload);
     } catch (err) {
       console.error("Invalid scoreboard payload:", err);
     }
@@ -225,6 +259,16 @@ toggleTransparentBtn.addEventListener("click", () => {
   const isTransparent = broadcastFrame.classList.toggle("obs-transparent");
   toggleTransparentBtn.classList.toggle("active", isTransparent);
 });
+
+if (toggleCommentaryBtn) {
+  toggleCommentaryBtn.addEventListener("click", () => {
+    commentaryEnabled = !commentaryEnabled;
+    toggleCommentaryBtn.classList.toggle("active", commentaryEnabled);
+    toggleCommentaryBtn.textContent = commentaryEnabled
+      ? "Commentary Audio: ON"
+      : "Commentary Audio: OFF";
+  });
+}
 
 fetch("/api/state")
   .then((r) => (r.ok ? r.json() : null))

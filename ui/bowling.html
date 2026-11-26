@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bowling Spell — Cricket Live</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="pages.css?v=26" />
+</head>
+<body data-page="bowling">
+  <main class="stage">
+    <section class="page-frame theme-bowling">
+      <header class="page-header">
+        <div>
+          <div class="page-kicker">ATTACK SUMMARY</div>
+          <h1 class="page-title">BOWLING FIGURES</h1>
+        </div>
+        <div class="live-score-pill">
+          <span class="pill-team" id="pillTeam">BAN vs SA</span>
+          <span class="pill-score" id="pillScore">0/0</span>
+          <span class="pill-overs" id="pillOvers">OVERS 0.0</span>
+        </div>
+      </header>
+      <div class="page-body">
+        <div class="photo-split">
+          <div class="photo-card" id="bowlHeroCard">
+            <img src="/assets/bowling_hero.jpg" alt="Bowler Action" />
+            <div class="photo-card-overlay">
+              <div class="photo-card-tag">CURRENT BOWLER</div>
+              <div class="photo-card-title" id="bowlHeroName">BOWLER</div>
+              <div class="photo-card-stat" id="bowlHeroStat">0-0 (0.0)</div>
+            </div>
+          </div>
+          <div class="glass-panel" style="overflow:auto">
+            <table class="pro-table" id="bowlingFullTable">
+              <thead>
+                <tr><th>BOWLER</th><th>OVERS</th><th>MAIDENS</th><th>RUNS</th><th>WICKETS</th><th>ECONOMY</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+    <nav class="page-nav">
+      <span class="nav-label">Broadcast Pages:</span>
+      <a class="nav-link" href="/">Scoreboard</a>
+      <a class="nav-link" href="/batting.html">Batting</a>
+      <a class="nav-link active" href="/bowling.html">Bowling</a>
+      <a class="nav-link" href="/overs.html">Overs &amp; FOW</a>
+      <a class="nav-link" href="/match.html">Match &amp; Win%</a>
+    </nav>
+  </main>
+  <script src="pages.js?v=26"></script>
+</body>
+</html>

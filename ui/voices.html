@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Indian Female Host Voice Auditions — Cricket Live</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #131b31 0%, #070b14 70%);
+      color: #f8fafc;
+      font-family: "Inter", sans-serif;
+      padding: 28px 20px 60px;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; }
+    .hdr { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 22px; }
+    .kicker { font-size: 12px; font-weight: 800; letter-spacing: 0.16em; color: #ffd426; text-transform: uppercase; margin-bottom: 4px; }
+    h1 { font-family: "Barlow Condensed", sans-serif; font-size: 40px; font-weight: 800; letter-spacing: 0.03em; }
+    .sample-box {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 212, 38, 0.3);
+      border-radius: 10px; padding: 14px 18px; margin-bottom: 22px; font-size: 15px; color: #e2e8f0;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+    .card {
+      background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+    .card:hover { border-color: rgba(255, 212, 38, 0.55); transform: translateY(-2px); }
+    .card.active { border-color: #22c55e; box-shadow: 0 0 24px rgba(34, 197, 94, 0.22); }
+    .num { font-family: "Barlow Condensed", sans-serif; font-size: 20px; font-weight: 800; color: #ffd426; }
+    .title { font-size: 17px; font-weight: 800; color: #fff; }
+    .desc { font-size: 13px; color: #94a3b8; }
+    .vid { font-family: monospace; font-size: 11px; color: #64748b; }
+    audio { width: 100%; height: 38px; border-radius: 6px; }
+    .btn {
+      background: #1e293b; color: #f8fafc; border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px; padding: 9px 14px; font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+    .btn:hover { background: #ffd426; color: #0f172a; border-color: #ffd426; }
+    .card.active .btn { background: #22c55e; color: #052e16; border-color: #22c55e; }
+    .toast {
+      position: fixed; bottom: 20px; right: 20px; background: #22c55e; color: #052e16;
+      padding: 12px 18px; border-radius: 8px; font-weight: 800; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hdr">
+      <div>
+        <div class="kicker">FISH AUDIO S2.1-PRO • INDIAN WOMEN HOST VARIATIONS</div>
+        <h1>CHOOSE YOUR HOST VOICE (10 STYLES)</h1>
+      </div>
+      <a class="btn" style="text-decoration:none" href="/director.html">← Back to Director</a>
+    </div>
+
+    <div class="sample-box">
+      <strong style="color:#ffd426;">Test Line Spoken by All 10 Voices:</strong><br/>
+      "अरे वाह... दुबई में नूर अहमद ने तो कमाल ही कर दिया! सच बताऊँ... मुझे तो पहले ही लग रहा था कि आज मैच पलटने वाला है!"
+    </div>
+
+    <div class="grid" id="voiceGrid"></div>
+  </div>
+  <div class="toast" id="toast">Updated active Host Voice!</div>
+
+  <script>
+    const voices = [
+      { idx: 1, id: "4c00e9ff458246c1855535d9fc637d04", name: "1. Cute & Confident", style: "Young, confident, expressive, slightly playful & warm" },
+      { idx: 2, id: "fbc790022fde406094754746cc3d01a5", name: "2. Sweet, Breathy & Flirtatious", style: "Soft breathy texture, cute, sassy & flirtatious edge" },
+      { idx: 3, id: "4d7609058bd34213b1378b29efbde1f1", name: "3. Bold & Sassy (Top Ranked)", style: "Punchy, energetic, confident Hindi conversationalist" },
+      { idx: 4, id: "2b9e2a84cb664489a7ab9ca71af5dff5", name: "4. Bubbly & Fast", style: "Bright, cheerful, animated social-media energy" },
+      { idx: 5, id: "94fc4065e6e04b9baf1aea2107e91d66", name: "5. Cheerful RJ Style", style: "Crisp radio-host tone, expressive & friendly" },
+      { idx: 6, id: "fc53c5a8a3fd4e2aaa1d4b7eded7ef3f", name: "6. Soft, Gentle & Silky", style: "Soothing, warm, smooth late-night radio feel" },
+      { idx: 7, id: "b67de7cfa4c6404ba5fb913b564b77dc", name: "7. Crisp Studio Presenter", style: "Cheerful young Indian accent, polished TV anchor" },
+      { idx: 8, id: "a6630e2dd6c14ea799c2a7c078e0d8de", name: "8. Poised Broadcast Anchor", style: "Clear, authoritative & confident studio presenter" },
+      { idx: 9, id: "a6306eb1184f484a9d2da6cb82542cde", name: "9. Calm & Intimate (Anu)", style: "Sweet, soft-spoken & gentle storytelling tone" },
+      { idx: 10, id: "b1a1d760d9604bdb957a56eec3460f1b", name: "10. Warm Mature Host", style: "Friendly, balanced & articulate senior presenter" },
+    ];
+
+    let activeId = "";
+    const grid = document.getElementById("voiceGrid");
+    const toast = document.getElementById("toast");
+
+    function render() {
+      grid.innerHTML = voices.map((v) => `
+        <div class="card ${activeId === v.id ? "active" : ""}">
+          <div class="title">${v.name}</div>
+          <div class="desc">${v.style}</div>
+          <div class="vid">ID: ${v.id}</div>
+          <audio controls preload="metadata" src="/assets/auditions/voice_${v.idx}.mp3"></audio>
+          <button class="btn" onclick="selectVoice('${v.id}', '${v.name}')">
+            ${activeId === v.id ? "✓ Active Host Voice" : "Set as Host Voice"}
+          </button>
+        </div>
+      `).join("");
+    }
+
+    async function selectVoice(id, name) {
+      const r = await fetch("/api/commentary/voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference_id: id }),
+      });
+      if (r.ok) {
+        activeId = id;
+        render();
+        toast.textContent = `Switched Host Voice → ${name}`;
+        toast.style.display = "block";
+        setTimeout(() => { toast.style.display = "none"; }, 2600);
+      }
+    }
+
+    fetch("/api/commentary/voice").then((r) => r.ok ? r.json() : null).then((d) => {
+      if (d && d.host_reference_id) activeId = d.host_reference_id;
+      render();
+    }).catch(render);
+  </script>
+</body>
+</html>

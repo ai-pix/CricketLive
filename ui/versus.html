@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matchday Versus — Cricket Live</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;1,800&family=Inter:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="pages.css?v=26" />
+</head>
+<body data-page="versus">
+  <main class="stage">
+    <section class="page-frame versus-frame" id="versusRoot">
+      <div class="vs-poster vs-code-bg">
+        <!-- Dynamic Team-Colored Diagonal Split -->
+        <div class="vs-bg-half vs-bg-left"></div>
+        <div class="vs-bg-half vs-bg-right"></div>
+
+        <!-- Graphic Poster Texture Layer (Automatically Recolored by Team Colors via mix-blend-mode) -->
+        <img class="vs-poster-art vs-art-tint" src="/assets/versus_graphic.jpg" alt="" />
+        <div class="vs-poster-vignette"></div>
+        <div class="vs-poster-sheen"></div>
+
+        <!-- Editorial Top Title -->
+        <div class="vs-poster-top" id="vsBanner">MATCHDAY SHOWDOWN • BAN VS SA</div>
+
+        <!-- Left Team Poster Typography -->
+        <div class="vs-poster-team vs-poster-left">
+          <div class="vs-poster-flag" id="vsFlagLeft"></div>
+          <div class="vs-poster-code" id="vsTeamLeft">BAN</div>
+        </div>
+
+        <!-- Center Sculpted VS -->
+        <div class="vs-poster-vs">VS</div>
+
+        <!-- Right Team Poster Typography -->
+        <div class="vs-poster-team vs-poster-right">
+          <div class="vs-poster-flag" id="vsFlagRight"></div>
+          <div class="vs-poster-code" id="vsTeamRight">SA</div>
+        </div>
+
+        <!-- Sharp Edge-to-Edge Poster Footer -->
+        <div class="vs-poster-footer">
+          <span>PRE-MATCH SHOW</span>
+          <span class="vs-foot-sep">•</span>
+          <span>COVERAGE STARTING SOON</span>
+          <span class="vs-foot-sep">•</span>
+          <span>LIKE • SHARE • SUBSCRIBE</span>
+        </div>
+      </div>
+    </section>
+    <nav class="page-nav"></nav>
+  </main>
+  <script src="pages.js?v=26"></script>
+</body>
+</html>

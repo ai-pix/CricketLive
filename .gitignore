@@ -11,3 +11,10 @@ wheels/
 
 # Secrets
 .env
+
+# Runtime caches, logs, DB, and large demo video
+cache/
+logs/
+cricket_live.db
+cricket_live.db-journal
+cricket_live_demo.mp4

@@ -10,7 +10,8 @@
     href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,700;1,800&family=Inter:wght@500;600;700;800&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="styles.css?v=16" />
+  <link rel="stylesheet" href="fx.css?v=2" />
 </head>
 <body>
   <main class="stage">
@@ -127,35 +128,10 @@
       <!-- SPACER -->
       <div class="stadium-spacer"></div>
 
-      <!-- BOTTOM PLAYER CARDS -->
+      <!-- BOTTOM PLAYER CARDS (STRIKER ALWAYS ON LEFT) -->
       <section class="players-grid" aria-label="Active Players">
-        <!-- NON-STRIKER -->
-        <article class="player-card card-batting">
-          <div class="card-header">
-            <span class="role-pill">NON-STRIKER</span>
-            <span class="mini-flag"></span>
-          </div>
-          <div class="card-body">
-            <div class="player-crest" aria-hidden="true">
-              <span class="crest-initials">NS</span>
-            </div>
-            <div class="player-info">
-              <h2 class="player-name">NAJMUL HOSSAIN SHANTO</h2>
-              <div class="player-main-stat">
-                <span class="big-num">12</span>
-                <span class="sub-num">(59)</span>
-              </div>
-            </div>
-          </div>
-          <div class="card-footer">
-            <span>4s <strong>1</strong></span>
-            <span>6s <strong>0</strong></span>
-            <span>SR <strong>20.34</strong></span>
-          </div>
-        </article>
-
-        <!-- STRIKER -->
-        <article class="player-card card-batting card-striker">
+        <!-- STRIKER (LEFT) -->
+        <article class="player-card card-batting card-striker" id="cardStriker">
           <div class="card-header">
             <span class="role-pill role-striker">
               <span class="strike-chevron">▶</span> STRIKER
@@ -178,6 +154,31 @@
             <span>4s <strong>0</strong></span>
             <span>6s <strong>0</strong></span>
             <span>SR <strong>0.00</strong></span>
+          </div>
+        </article>
+
+        <!-- NON-STRIKER (MIDDLE) -->
+        <article class="player-card card-batting" id="cardNonStriker">
+          <div class="card-header">
+            <span class="role-pill">NON-STRIKER</span>
+            <span class="mini-flag"></span>
+          </div>
+          <div class="card-body">
+            <div class="player-crest" aria-hidden="true">
+              <span class="crest-initials">NS</span>
+            </div>
+            <div class="player-info">
+              <h2 class="player-name">NAJMUL HOSSAIN SHANTO</h2>
+              <div class="player-main-stat">
+                <span class="big-num">12</span>
+                <span class="sub-num">(59)</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>4s <strong>1</strong></span>
+            <span>6s <strong>0</strong></span>
+            <span>SR <strong>20.34</strong></span>
           </div>
         </article>
 
@@ -241,9 +242,34 @@
       <button type="button" class="demo-btn" data-event="WICKET!" data-tone="wicket">Wicket</button>
       <button type="button" class="demo-btn" id="toggleTransparent">OBS Transparent BG</button>
       <button type="button" class="demo-btn" id="toggleCommentary">Commentary Audio: OFF</button>
+      <span class="demo-label" style="margin-left:8px;">Pages:</span>
+      <a class="demo-btn active" href="/">Scoreboard</a>
+      <a class="demo-btn" href="/versus.html">Versus</a>
+      <a class="demo-btn" href="/batting.html">Batting</a>
+      <a class="demo-btn" href="/bowling.html">Bowling</a>
+      <a class="demo-btn" href="/overs.html">Overs &amp; FOW</a>
+      <a class="demo-btn" href="/match.html">Match &amp; Win%</a>
+      <a class="demo-btn" href="/playing11.html">Playing XI</a>
+      <a class="demo-btn" href="/player.html">Player Card</a>
+      <a class="demo-btn" href="/info.html">Match Info</a>
+      <a class="demo-btn" href="/partnership.html">Partnership</a>
+      <a class="demo-btn" href="/break.html">Break Screen</a>
+      <a class="demo-btn" href="/leaders.html">Top Performers</a>
+      <a class="demo-btn" href="/milestone.html">Milestone</a>
+      <a class="demo-btn" href="/runrate.html">Boundaries</a>
+      <a class="demo-btn" href="/projected.html">Projected</a>
+      <a class="demo-btn" href="/pitch.html">Pitch &amp; Venue</a>
+      <a class="demo-btn" href="/form.html">Team Form</a>
+      <a class="demo-btn" href="/points.html">Points Table</a>
+      <a class="demo-btn" href="/rankings.html">ICC Rankings</a>
+      <a class="demo-btn" href="/report.html">Match Report</a>
+      <a class="demo-btn" href="/story.html">Match Talks</a>
+      <a class="demo-btn" href="/audience.html">Audience Zone</a>
+      <a class="demo-btn" href="/director.html" style="border-color:#ffd426;color:#ffd426">Broadcast Director</a>
     </div>
   </main>
 
-  <script src="app.js?v=8"></script>
+  <script src="fx.js?v=2"></script>
+  <script src="app.js?v=16"></script>
 </body>
 </html>

@@ -102,14 +102,20 @@ def save_match_state(match_url: str, state_dict: dict) -> None:
         )
 
 
-def load_latest_match_state() -> dict | None:
+def load_latest_match_state(match_url: str | None = None) -> dict | None:
     if not DB_PATH.exists():
         return None
     init_db()
     with _connect() as conn:
-        row = conn.execute(
-            "SELECT state_json FROM matches ORDER BY updated_at DESC LIMIT 1"
-        ).fetchone()
+        if match_url:
+            row = conn.execute(
+                "SELECT state_json FROM matches WHERE match_url = ? LIMIT 1",
+                (match_url,),
+            ).fetchone()
+        else:
+            row = conn.execute(
+                "SELECT state_json FROM matches ORDER BY updated_at DESC LIMIT 1"
+            ).fetchone()
         if not row:
             return None
         try:

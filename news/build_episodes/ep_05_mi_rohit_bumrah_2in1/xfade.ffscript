@@ -1,0 +1,12 @@
+[0:v][1:v]xfade=transition=slideleft:duration=0.450:offset=5.150[v00];
+[v00][2:v]xfade=transition=smoothleft:duration=0.450:offset=10.300[v01];
+[v01][3:v]xfade=transition=slideright:duration=0.450:offset=15.450[v02];
+[v02][4:v]xfade=transition=wipeleft:duration=0.450:offset=20.600[v03];
+[v03][5:v]xfade=transition=smoothright:duration=0.450:offset=25.750[v04];
+[v04][6:v]xfade=transition=slideleft:duration=0.450:offset=30.900[v05];
+[v05][7:v]xfade=transition=smoothleft:duration=0.450:offset=36.050[v06];
+[v06][8:v]xfade=transition=slideright:duration=0.450:offset=41.200[v07];
+[v07][9:v]xfade=transition=wipeleft:duration=0.450:offset=46.350[v08];
+[v08][10:v]xfade=transition=smoothright:duration=0.450:offset=51.500[v09];
+[v09][11:v]xfade=transition=slideleft:duration=0.450:offset=56.650[vjoined];
+[vjoined]fade=t=in:st=0:d=0.25,fade=t=out:st=61.367:d=0.45,subtitles=news/build_episodes/ep_05_mi_rohit_bumrah_2in1/subs.ass,format=yuv420p[vfinal]

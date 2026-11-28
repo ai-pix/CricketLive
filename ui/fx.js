@@ -1,5 +1,10 @@
 /* Shared Polished Event Stinger (FOUR, SIX, WICKET) */
+function getFxMountHost() {
+  return document.fullscreenElement || document.querySelector(".director-stage") || document.body;
+}
+
 function ensureFxOverlay() {
+  const host = getFxMountHost();
   let el = document.getElementById("fxOverlay");
   if (!el) {
     el = document.createElement("div");
@@ -16,16 +21,18 @@ function ensureFxOverlay() {
         <div class="fx-sub" id="fxSub"></div>
       </div>
     `;
-    document.body.appendChild(el);
+    host.appendChild(el);
+  } else if (el.parentNode !== host) {
+    host.appendChild(el);
   }
   return el;
 }
 
 window.triggerEventFx = function (eventType, subtitle = "") {
   const el = ensureFxOverlay();
-  const kickerEl = document.getElementById("fxKicker");
-  const titleEl = document.getElementById("fxTitle");
-  const subEl = document.getElementById("fxSub");
+  const kickerEl = el.querySelector("#fxKicker");
+  const titleEl = el.querySelector("#fxTitle");
+  const subEl = el.querySelector("#fxSub");
   const norm = (eventType || "").toUpperCase();
 
   el.classList.remove("active", "fx-four", "fx-six", "fx-wicket");
@@ -52,12 +59,15 @@ window.triggerEventFx = function (eventType, subtitle = "") {
 };
 
 window.triggerMilestoneFx = function (data) {
+  const host = getFxMountHost();
   let el = document.getElementById("fxMilestoneWrap");
   if (!el) {
     el = document.createElement("div");
     el.id = "fxMilestoneWrap";
     el.className = "fx-milestone-wrap";
-    document.body.appendChild(el);
+    host.appendChild(el);
+  } else if (el.parentNode !== host) {
+    host.appendChild(el);
   }
   el.innerHTML = `
     <div class="fx-ms-card">

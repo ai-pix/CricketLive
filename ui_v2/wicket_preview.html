@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wicket Animation Preview — Cricket Live</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #060b16;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      background: #0f172a;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .toolbar h1 {
+      margin: 0 12px 0 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #f8fafc;
+    }
+    button {
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    button:hover { background: #334155; border-color: #60a5fa; }
+    button.danger { background: #7f1d1d; border-color: #ef4444; }
+    button.danger:hover { background: #991b1b; }
+    button.primary { background: #1d4ed8; border-color: #60a5fa; }
+    button.primary:hover { background: #2563eb; }
+    .status {
+      margin-left: auto;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow: hidden;
+    }
+    .frame-wrap {
+      width: 100%;
+      max-width: 1600px;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+      background: #000;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <h1>WICKET ANIMATION PREVIEW</h1>
+    <button class="danger" onclick="triggerStrikerOutPending()">1. Striker Out (Pending New Batter)</button>
+    <button class="primary" onclick="triggerNewBatterArrives()">2. New Batter Slides In</button>
+    <button class="danger" onclick="triggerStrikerOutImmediate()">3. Striker Out → Auto Slide-In (1.6s)</button>
+    <button onclick="triggerNonStrikerOut()">4. Non-Striker Run Out</button>
+    <button onclick="triggerOverDone()">5. Over Done (Resets in 3s)</button>
+    <button class="primary" onclick="triggerStrikeSwap()">6. Swap Striker ↔ Non-Striker</button>
+    <button onclick="resetPreview()">Reset</button>
+    <span class="status" id="statusText">Ready — initial live state</span>
+  </div>
+
+  <div class="stage">
+    <div class="frame-wrap">
+      <iframe id="previewFrame" src="/broadcast.html?preview=1&auto=0"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const frame = document.getElementById("previewFrame");
+    const statusText = document.getElementById("statusText");
+
+    function baseState() {
+      return {
+        batting_team: "BAN-A",
+        bowling_team: "PAK-A",
+        runs: 34,
+        wickets: 2,
+        overs: "8.2",
+        target: 0,
+        crr: 4.08,
+        rrr: 0,
+        partnership: "18(22)",
+        curr_over: ["1", "0", "4", "0"],
+        prev_over: { over_number: 8, balls: ["1", "0", "4", "0", "1", "0"], total: 6 },
+        callout: "",
+        callout_tone: "neutral",
+        last_wicket: "TANZID HASAN • 11(14)",
+        striker: {
+          name: "MAHMUDUL HASAN JOY",
+          runs: 14,
+          balls: 28,
+          fours: 1,
+          sixes: 0,
+          strike_rate: 50.0,
+          on_strike: true,
+          dismissal: "batting"
+        },
+        non_striker: {
+          name: "SHAHADAT HOSSAIN DIPU",
+          runs: 9,
+          balls: 20,
+          fours: 1,
+          sixes: 0,
+          strike_rate: 45.0,
+          on_strike: false,
+          dismissal: "batting"
+        },
+        bowler: {
+          name: "SUFYAN MOQIM",
+          overs: "2.2",
+          maidens: 0,
+          runs_conceded: 12,
+          wickets: 1,
+          economy: 5.14
+        }
+      };
+    }
+
+    let current = baseState();
+
+    function sendState(state, label) {
+      current = state;
+      frame.contentWindow?.postMessage({ type: "preview_state", state }, "*");
+      statusText.textContent = label;
+    }
+
+    function resetPreview() {
+      frame.src = "/broadcast.html?preview=1&auto=0&t=" + Date.now();
+      current = baseState();
+      statusText.textContent = "Reset to initial state";
+    }
+
+    function triggerStrikerOutPending() {
+      const next = structuredClone(current);
+      next.wickets += 1;
+      next.overs = "8.3";
+      next.curr_over = [...(next.curr_over || []), "W"];
+      next.callout = "WICKET!";
+      next.callout_tone = "wicket";
+      next.bowler.wickets += 1;
+      next.bowler.overs = "2.3";
+      sendState(next, "Striker OUT (pending replacement) — ONLY Striker card is B&W; Non-Striker stays full color");
+    }
+
+    function triggerNewBatterArrives() {
+      const next = structuredClone(current);
+      next.callout = "";
+      next.callout_tone = "neutral";
+      next.striker = {
+        name: "SAIF HASSAN",
+        runs: 0,
+        balls: 0,
+        fours: 0,
+        sixes: 0,
+        strike_rate: 0.0,
+        on_strike: true,
+        dismissal: "batting"
+      };
+      sendState(next, "New batter SAIF HASSAN slid in from left-to-right on Striker card");
+    }
+
+    function triggerStrikerOutImmediate() {
+      const next = structuredClone(current);
+      next.wickets += 1;
+      next.overs = "8.3";
+      next.curr_over = [...(next.curr_over || []), "W"];
+      next.callout = "WICKET!";
+      next.callout_tone = "wicket";
+      next.bowler.wickets += 1;
+      next.bowler.overs = "2.3";
+      next.last_wicket = `${next.striker.name} • ${next.striker.runs}(${next.striker.balls})`;
+      next.striker = {
+        name: "SAIF HASSAN",
+        runs: 0,
+        balls: 0,
+        fours: 0,
+        sixes: 0,
+        strike_rate: 0.0,
+        on_strike: true,
+        dismissal: "batting"
+      };
+      sendState(next, "Striker OUT → holding old striker B&W for 1.6s, then sliding in SAIF HASSAN");
+    }
+
+    function triggerNonStrikerOut() {
+      const next = structuredClone(current);
+      next.wickets += 1;
+      next.overs = "8.3";
+      next.curr_over = [...(next.curr_over || []), "W"];
+      next.callout = "RUN OUT!";
+      next.callout_tone = "wicket";
+      next.non_striker.dismissal = "run out";
+      next.last_wicket = `${next.non_striker.name} • ${next.non_striker.runs}(${next.non_striker.balls})`;
+      sendState(next, "Non-Striker RUN OUT — ONLY Non-Striker card is B&W; Striker stays full color");
+    }
+
+    function triggerOverDone() {
+      const next = structuredClone(current);
+      next.overs = "9.0";
+      next.curr_over = { over_number: 9, balls: ["1", "0", "4", "0", "2", "1"], total: 8 };
+      next.bowler.overs = "3.0";
+      sendState(next, "Over 9 complete — will reset to Over 10 (= 0) after 3 seconds");
+    }
+
+    function triggerStrikeSwap() {
+      const next = structuredClone(current);
+      const oldStriker = next.striker;
+      const oldNonStriker = next.non_striker;
+      next.striker = { ...oldNonStriker, on_strike: true };
+      next.non_striker = { ...oldStriker, on_strike: false };
+      sendState(next, `Swapped strike: ${next.striker.name} ↔ ${next.non_striker.name} (bat fades out during slide, returns after)`);
+    }
+  </script>
+</body>
+</html>

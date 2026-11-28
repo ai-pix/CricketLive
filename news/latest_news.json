@@ -1,0 +1,515 @@
+{
+  "fetched_at": "2026-11-28T12:22:06+00:00",
+  "sources": {
+    "Match Wire": 25,
+    "ESPNcricinfo": 25,
+    "BBC Sport": 25,
+    "NDTV Cricket": 20,
+    "TOI Cricket": 20,
+    "Cricket Wire": 25
+  },
+  "total": 50,
+  "db_added": 4,
+  "items": [
+    {
+      "title": "India Coach Delivers Blunt Reaction On Rishabh Pant's Approach After Dismissal In 2nd NZ Test",
+      "summary": "India's spin bowling coach Sairaj Bahutule on Saturday backed Rishabh Pant's high-risk batting approach, describing his dismissal against Jacob Duffy in the second Test against New Zealand as \"one of those days\" when things simply did not g",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/new-zealand-vs-india-2026-27/india-coach-delivers-blunt-reaction-on-rishabh-pants-approach-after-dismissal-in-2nd-nz-test-12388252#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/ihwjcxgsw_rishabh-pant_625x300_28_November_26.jpg?im=FeatureCrop,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 16:10:33 +0530",
+      "published_ts": 1795862433.0,
+      "category": "match_news"
+    },
+    {
+      "title": "India Coach Makes Strong Remark After Jasprit Bumrah Goes Wicketless In 2nd NZ Test",
+      "summary": "India's spin-bowling coach Sairaj Bahutule backed pace spearhead Jasprit Bumrah after a wicketless outing in the first innings of the Christchurch Test.",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/new-zealand-vs-india-2026-27/india-coach-makes-strong-remark-after-jasprit-bumrah-goes-wicketless-in-2nd-nz-test-12388325#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/c55c7vv_jasprit-bumrah_625x300_23_November_26.jpeg?im=FitAndFill,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 17:07:45 +0530",
+      "published_ts": 1795865865.0,
+      "category": "match_news"
+    },
+    {
+      "title": "IND vs NZ, 2nd Test: Bahutule admits ‘disappointing day’ as India batters err in shot selection",
+      "summary": "Sportstar",
+      "source": "Sportstar",
+      "source_url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNdVlFSlVwQnprbU8xTWdWR3N6TjFiTFVaQVhYZVdnSkN2MExGZFF6MVNfTDd5WjZVMWV6VU1aTndxOFF1SHBoYjFQQXpOelZfNEhMUWZuZ3pCb2pTUk1NU3JPclhjTlJMSVMwdXZCY2NJRXFsSXhfemF1c0F4NTVvMnBtYTExQVVmTThyTnRNcVZhMmtKbHM0YjRFUUxvaHhPajRVMG9reFlOazFPUnJNNXNQSkZsWVR0MTB0bzhVb3cySVpZbFBGS1NmNUxNcWdfcHNlOUxDUdIB3gFBVV95cUxPdGphbEZlQ29LaFVDSC1XU25NVWlNTEk3UXhheHpTM2JDLUw5UmNPdGFnOUg2SkI3QkpGMDhFS3hYRi1yZzJVVHJfVEJTZ2FWbW45bFk1RE1sNGZNdzZRVm1uZE95aTZWLUp5X1pEdzlfN1U3U1h1VndpTUNDNFcyaXB0S1dfUDJSckQzTjZmWWFZUzAzNnc4MWx1bE5HWkNnN05Dd1paNDZjbkZrc0dkSzljZmJCdTVVdjNEdFo0N0dJUGdQWGJZWG1nWlNYdTFLSjJSS0RBOHRDQURSRVE?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 11:05:04 GMT",
+      "published_ts": 1795863904.0,
+      "category": "match_news"
+    },
+    {
+      "title": "IND vs NZ 2nd Test: How Jacob Duffy got revenge against Rishabh Pant in Christchurch",
+      "summary": "Rediff.com",
+      "source": "Rediff.com",
+      "source_url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQMjlMYjZDd012dW5LYWNvbTBtVnhIeXpNeEZTT3g3dEJUSUlZQjZXQjlYMWlZa2FrNDJpUFMtVmtwOHdiNFhfUTBsdnh1UkE3UDJ5MVBhQ0dWRVVha1g1NHBXVmlUN0VQUF8xNG5vSkVidUEzSGhBUTZLdkZKQy0zT2kxRWdHSDFsN2xMYUlCVUNHMjYzOHY5R2xRWThjaVBCWWNINHdtdGVsY3YwcDg5MmVUNFVpN0hrU1JnbklIMnhSSFVhX05tZ1JrRUJDbmPSAdIBQVVfeXFMTXg0NmkzUHpNcjdGdFBqOE1EYk85aVhfeUNlR2JZbU5XRTU0M3F3TklLMWpERWFocWFMZlJCd0VEOGhCQ3B1NGQ4TUpCWU1NTXFtaUIxbEJQVmVBZ1Z0ajMzLTZNVEI0M1ZOZzRfZm42c3pZVEFWbUpHcE5JTWo3WkQ3bG1lOU94aGlZaDVxdnExZ2RuQk0ya0JuaDV6NVRNbFN3REd2eUpmYlRJc1BRQlhwVGFiSkFZTUNIWHdpdldRUFVGSGlMUU91d0FTNnViNTdn?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 10:56:00 GMT",
+      "published_ts": 1795863360.0,
+      "category": "match_news"
+    },
+    {
+      "title": "NZ vs IND: After Wellington nightmare, Jacob Duffy finds his rhythm in Christchurch",
+      "summary": "India Today",
+      "source": "India Today",
+      "source_url": "https://news.google.com/rss/articles/CBMi6wFBVV95cUxOcTBOYkhhZVU1M21scWNfd1d2cnJvb0EtcG9jSjBBdlVGWWNSMzJKZEJQWW4xS082YThrTXhlbi1FM2pka2V2M05ycVFPM2pidWtvLWRqY1BlWXNULXZQYW42Y3pzN0FKa3VuNUVaSmlLYXRjaDZpM0xVYnhic0J2NHFpcTgtejJMMlo0WlNkRVRxbVIxekRUX2Fzck9tZm9PY3RWbFlMUExac2phOTlFNzFKblBDLVMyY1VHRzZjc1lKQm5MbTl6T3FVTEJmTTQzV3NFcGVBRFQ3a0hRV3JmMFBSWmJhclpNMVN30gHwAUFVX3lxTE1ZSjAwalhtUGc1Q1RWSm1URnpJTTRmc2VXNUtmTjlfckt3X3NQejRKRGZVcW9wdVBtUmhOVnVLbmJsd2pZb1RFZTR3YWtXRHFLbXNWVmdjY3MzN056OEFiaWlqLUdsd0RiN2ZCX1dMbWtYaGJnRGc5M0J0SnBVcFFiUmMybFRwVUdfbWhJczQ3cUVfR1d5Mko2eGlZTkR0b0ZEV3FYN3dVLTZ4cU1ycFpVaDBGVkJ3eHlDNzlIeV9fSkIwcUdFTWpkek1fbzQwdy12NEpwQTBjYUhLUkpvNUlGdDhRdzU1Ny1JWTNmS2xFYQ?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 10:27:42 GMT",
+      "published_ts": 1795861662.0,
+      "category": "match_news"
+    },
+    {
+      "title": "INDU19 339/9 (50) vs PAKU19 337/9 (Mohit Ulva 49(26) Chigurupati Venkata 11(8)) | Pakistan U19 vs India U19, Final, ACC Men's U19 Asia Cup 2026 Live Cricket Stream, live scores, ball-by-ball commentary, highlights, videos, news, and more in USA & Ca",
+      "summary": "Cricbuzz",
+      "source": "Cricbuzz",
+      "source_url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQOTdlZS1jMGJqelhHLUVrTk84U2tMclJHU1hjRVM3aUJhQk4wY3otektPemJfRFNxbGx0MTNUbURTZXdEUkpGbmM0cFhtVWctRnVnUmZTeVVGNWNXM3Exd0NLa2dWT0VyQ0YwMm9fV3JUUEhreVV6OEw3aEc5aTQ5WGZGNThzSVFXVkI2WHFpSXA3Z3RLYjAxajF0bUVKampCVlFz?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 09:32:43 GMT",
+      "published_ts": 1795858363.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Sunil Gavaskar Spots What Mohammed Siraj Is Doing Despite Being Left Out Of India's XI",
+      "summary": "Despite growing calls for his inclusion following India's bowling struggles in the opening Test, Siraj was overlooked once again for the second Test against New Zealand",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/new-zealand-vs-india-2026-27/mohammed-siraj-is-always-happy-sunil-gavaskars-ultimate-praise-for-snubbed-star-as-he-carries-drinks-for-india-teammates-during-2nd-test-12388436#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/v6a28c38_mohammed-siraj-shubman-gill-sunil-gavaskar_625x300_19_November_26.jpg?im=FeatureCrop,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 14:29:42 +0530",
+      "published_ts": 1795856382.0,
+      "category": "match_news"
+    },
+    {
+      "title": "After Criticising Rishabh Pant, R Ashwin Gets Trolled. His Reply Leaves Fans Impressed",
+      "summary": "A user tried to troll R Ashwin over his comments on Rishabh Pant's wicketkeeping, but the former India spinner came up with a well-composed reply.",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/new-zealand-vs-india-2026-27/after-criticising-rishabh-pant-r-ashwin-gets-trolled-his-reply-leaves-fans-impressed-12385533#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/gsra6phn2_r-ashwin-rishabh-pant-x_625x300_27_November_26.jpg?im=FeatureCrop,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 13:28:22 +0530",
+      "published_ts": 1795852702.0,
+      "category": "match_news"
+    },
+    {
+      "title": "IND vs NZ: Dropped catches and no-balls undo Akash Deep’s five-for",
+      "summary": "The Indian Express",
+      "source": "The Indian Express",
+      "source_url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOZDVsVWxwUy12VTh4VjE0NXA2RFd4ZzA0NGlJZjNmM2NnT2t5NUthZkJqWjBrMlBYT0w4N0J3a0RBNG9FNDNhUWNTN1hHNVJvdzllbHZ6cnNqVUpORjg0QlJNcGhEQ1dxQW5kc3B6WWZrQ1ZtbnZnMXRaZmNobUI1S2pmb19LRDVlYlVWNFVDbzN1d1pEVS1COFdfSFJza0pBNWdkWGNtWjQ4V2MxbmRSd215Y3hvR3BERmFVUElaY3TSAccBQVVfeXFMUGYzU2FqN0M1MURYU3UwQ0I3S1B1SXczVzd1YTkwcmVvUnlLcTN3ZlJPR1p3d1Z2NEstdnZmUDJwWG5Lc01ZSGJrSld4VjBzVFFNbjBFZ1hzaUFjVnJQUjBqZ0laV1NlOUt4N2s4TEN5Vi1fM1Y5QUxodEF3WXg4UU14eGhtelN2bXZtRlUyc2tabnlaTXhlS2xiUEhWS056X1BZNGxNNjZKeWp2T1FxZ2ZKSnJLRFBNazI2dFVKWjBZeTRiOWJ4dw?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 07:31:10 GMT",
+      "published_ts": 1795851070.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Aggression proves costly: India Stumble to 116 for six against New Zealand | IND vs NZ | Cricket News in ENgkish",
+      "summary": "Onmanorama",
+      "source": "Onmanorama",
+      "source_url": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxNWjJxWmJ5bmJGbFF4Q1ZmRXQ5dGVnLWRJd3Q5b01Db3k3Si1YNWM0LXh2aEI2ZjNmUlFyaE1FVzdya25GTFZwdkNKYXB2WmJYWllQMVR3UElhNkhPV1pYdEpmWDUyYnU4a3JmWTItVmFTVmJiMkRKVl9YNllJRHZQMGhJMDFfczdoRFlRUnhNZENjaXVfSVAwTVV0QldONG40MUNxUW93MUdtOGtoNTNIdjlFa3JwVVd0ZzNqV1owdVZra3d2OE01QzlsTTZmTDZmdFZfWkxtVnlKQk1mM01Xb3VvLW9ZUVhQWnc?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 07:30:02 GMT",
+      "published_ts": 1795851002.0,
+      "category": "match_news"
+    },
+    {
+      "title": "IND vs NZ 2nd Test: India's WTC Hopes Hang By A Thread After Batting Collapse On Day 2",
+      "summary": "Rediff.com",
+      "source": "Rediff.com",
+      "source_url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPWng1a1ZtYzgweDU0bW5LUkV3SkpXVWIyZVBjRm9CVFpjMXdDNzBrTDVGUUlrSE5DaC1MTkttakxVdURYSnZjN2lKNUZkYnZucHJIQk1ienJSWUtXVWRzVTZGZ1JPMV9ZR3lRMnBxdnhZSDlReDNmd196SURVRUNaYzY3ZXdJdVVIbnNaV3ZXWkpBOVkwRm5JNHVESEpPcUJVajBVMjJDWnVPVDA3QzZUNm5OSXh4R3V2S2NBRTNIRURkaE4ybnh3RFpnNGhjUW1jamhJ0gHWAUFVX3lxTE1xcmktRFJsNUlKYmc1em1MY1dWLVBHOGdsd05jOVhlckdTRGlIMnI0WWxpXzREeExNaVJYNnVmUTB2Tk9XT3BkcFhnbVVZbEp1VjlFQ2hOOHdrTHBzcVpnOGtoZm55T3ZSdHJSMUUxTC1ZaThXdzc1NWZqcElhb3A3ampaTDFyYnJpcmYzNGNrNkVHQXFwUWpjdmtfTmJoRTMxUzA4aUJpd19HX1FJTmhvdEVoVXZYV0p2eHYxTkRDdnFNRFZYX1ZIaGpZdEJmNXkxUXRLUlE?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 07:26:19 GMT",
+      "published_ts": 1795850779.0,
+      "category": "match_news"
+    },
+    {
+      "title": "2nd Test: NZ bowlers seize control as India down to 116/6 at stumps on Day 2",
+      "summary": "DD News",
+      "source": "DD News",
+      "source_url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPWjVVT1h3ME9xX0FOSjJ5M3kyWWlpeWprdDRGS1ZLNXNnam45c0ExUjEyLTJBa1VvanlRbm5TVTQ4X09RUHNwb1RlSmVPOC1OallqdjZBamk1NW1DWWQzX18xMTkwWU1NLUU2bEphQy0ycU5SYTNEMjZkenRfdWFIY0lrQ0h1VlFSU085bExlanZZVTdSakY3UDdXZ242Z3BuQ2JF?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 06:42:05 GMT",
+      "published_ts": 1795848125.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Catches dropped, wickets tumble: India let New Zealand seize control on Day 2",
+      "summary": "India Today",
+      "source": "India Today",
+      "source_url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxPZ1g0dmhhanJLTTg2Z0Y3TFY1MkFvYkpxR0VrUHRVUmdWLUVuZHRLSGZXdUtteFZibUxXUDFieThnZ3NZcFo1dEhCSjVObFNGTlhDQllTSXFrYWZuakl1MWZvcEJQcS03TUlvUXN1dVZPWk5QSWpEa1BLX0Nvd3hJb3R3WFhxR2I5VGgtd1NEOS1qdHVfalloSUF5YlpVMEoyUllibm1jSVZEaVdtS002TVoydUdVZTlLVTFxMkpCOHlKVThYQmZvY1UxSl8tekxzbm14U1NQN0LSAd4BQVVfeXFMT2tRX2Z2Rk54WDRWMkVKVlVsa1VIOEM4SUsxVjh5YTNPWF9RNm1WLVdJZVhNcjlaWmpSQUlpcDlqbk1NQkxzVWNEcWxzV1J1VEJBN0hrTTlsdGpZZERDQ1pTWGVLQmxnREFUN09zSWF5TldrdWs3YmIyYnMxRVp4UnJNcFduai1NbkxQaEFCdjY2MFlfZTNOdGlZMFhLX1NXR1RpSlFPWVpsa19GS2tmQ2JnV2haQlNpY2NBeGppdWpWS2tIWWptRkpUTmFlb0Q3TlotZHZFX3Rqd1lTZTVR?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 05:59:07 GMT",
+      "published_ts": 1795845547.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Ind vs NZ, 2nd Test: India in trouble after New Zealand post 356 on Day 2",
+      "summary": "The Federal",
+      "source": "The Federal",
+      "source_url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOVFVxaDYtbE9wTnd1NEpVM2l3Y3FiWWxTOGtMc3F5MUdFaEo3SlY2Wlg4SEwtUTlJMERpYWNValZISExOcTFpRW93LS0wUjBtZ0VCUE1sZTZxdHdHeXlpX0Q3VFg3eWcxblV1cS1wMGJCTHk4c0VCNFZwSm5KUkVEMGRCdUJTeWZOblpnbXZfOEo?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 05:57:13 GMT",
+      "published_ts": 1795845433.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Cricket match squads | NZ vs IND, 1st T20I, India tour of New Zealand 2026",
+      "summary": "Cricbuzz",
+      "source": "Cricbuzz",
+      "source_url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNX2pZNVVWT2pYcUxtOHFZYW9TT0szNDJ5eTB1aVBUdmFnS2hfbkVHRHpLelE4RjdWaWJIOVpyZzhZSWFPcmtBb2ZrYU5UdWVYbnJyTUtBM0hPZmVPb2VaVm95X2FNOTBoUUxQMDBzLXN3WEZ5VkFHQzlXTS1SN0ZwVFpEeURVbnJZU20ycUZweGJ1UmIxZHF6bDVfbFJiZ21BZXNNUQ?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 05:52:07 GMT",
+      "published_ts": 1795845127.0,
+      "category": "match_news"
+    },
+    {
+      "title": "India vs New Zealand, 2nd Test Day 2 Highlights: Rishabh Pant, KL Rahul, Yashasvi Jaiswal Flop As NZ Reduce India To 116/6 At Stumps",
+      "summary": "India vs New Zealand Highlights, 2nd Test Day 2: India reach 116/6 at stumps, trail New Zealand by 240 runs on Day 2 of second Test in Christchurch.",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/new-zealand-vs-india-2026-27/india-vs-new-zealand-live-score-2nd-test-day-2-ind-vs-nz-live-updates-shubman-gill-jasprit-bumrah-12386737#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/bo8zyp6am_rishabh-pant_625x300_28_November_26.jpg?im=FeatureCrop,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 11:17:10 +0530",
+      "published_ts": 1795844830.0,
+      "category": "match_news"
+    },
+    {
+      "title": "IND vs NZ, 2nd Test: Akash Deep fifth Indian pacer to claim 5-wicket haul in New Zealand",
+      "summary": "Rediff.com",
+      "source": "Rediff.com",
+      "source_url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOT29xZWtVMmdTTXpSUG9OZzgwTUFFcExjWFl4Sm9PMUVsT3BpWGs1MnlsNXpNbXFZQWZVVjItdkd4cF9idEZteUdSNUxsa0ozZXYzUXZPZXFncmRUSGZuUWZPRUdSdWpGekhRTHRuNXRYdExURjNHQV9pcWZRcWFBSzNLaUd5VGN2MTFIcjRYMlAwSzlfTXFkZUJndG5wMU9Hb25iQTlhTUlFRk0zMzJBXzFURkVCWXpiM2hDZ0ZOWWlZOHltNlc0U2xjRGYzQnh2LTdJ0gHWAUFVX3lxTE1TRXk0YlQzRmlXVExUX1BZeEpqMFNwc2JNcGdCaDNUR0Z0bENKYkVQN3M2d0E0SFQ4RGVQYjEzaXhUc0pZMWJ3NEQwRmRQYk9GQllpQlRtNDU0X3BXTlNENHM5eU9mRDVTbWJBdVRDenVORjc2N1p6MlUwdEgzYmhGcWZRd3Rab2VpbS12ZVJiOVhVeEUyZFVOWEpYckdTSWJCZ3dFSkVycy14OEd2NWc1c2NfNTh1VVVMZ2d5dllRSUJUR25lMnJkS204bF9vWGdiVWMta2c?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 05:39:47 GMT",
+      "published_ts": 1795844387.0,
+      "category": "match_news"
+    },
+    {
+      "title": "India in trouble after Day 2 batting collapse | NZ vs IND",
+      "summary": "Cricbuzz",
+      "source": "Cricbuzz",
+      "source_url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNNWVQeVJ1TzRMaTFobTNZbGlWNHNiOXF5UlFEa3NsYVpUNmhtQ1VjUE5ia0FLaVlTLWV1RzJPSmlpTnl6cEoxc2k3U2NfaThvNkNrT0g4NFdZWnBnYUl2b3MtajJsOGhLY0ZfbFhWdHl1dXBNTlRxaHQ4WVVQVENmd3lDWmppMmQ4SmQtZVJ5RnNTc2wyY2NGVkV1anBHbmg2MDRUNQ?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 05:38:04 GMT",
+      "published_ts": 1795844284.0,
+      "category": "match_news"
+    },
+    {
+      "title": "IND vs NZ: Why Jaiswal keeps failing in the innings after a big score",
+      "summary": "The Indian Express",
+      "source": "The Indian Express",
+      "source_url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNTnRWS0dCbEljRHVDTXA0QVRZbzdpMWIyS2hEajVUNFFLUmNnLW9GWDlaYWpTQnl2LURYcENmNnZvYXg4eG9Sa0x4bEFDcEdnd0d3U05sQTJxcjhSWHUteHpDdWRONUM3UW5DY000RHpmbnJwMldxcXhpS0xvbGJMb0todGFaOXhpX3dhclJ5WEp2djFXMTBqMHp6cTNTODlOZjFhYzhqcEw2b21henFGQWRiREt6bTBpTWZkSVI2cjhFYWYwU2fSAcwBQVVfeXFMT3VjeXRjZHpUV05FWnNsdWdlam9CZ2IwS2tPb3k2dU40UWdDNk1vMVpVVzRpVVBES3dsNTVOUW1Temw3WmxNbVhyZ0NaU2RQUXhDZGN5VkZ4NC1UOTBhMnMzaEhuYXRJRkFSQWR4TVBnRk9QR08zMDJIMzlUc2ZnV1RQM0hBTnJaazdJZVo5UHkzT2ZlNVh0cWZuN1pIcE5kUFVtclRTM0hNSVlhQzVKUk02WXZ2blRRTFZGeE12Mmt3ZlhfdmJ6b3NzWlB4?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 04:22:07 GMT",
+      "published_ts": 1795839727.0,
+      "category": "match_news"
+    },
+    {
+      "title": "'Don't Think This Will End Well For Mohammed Siraj': R Ashwin Sounds Alarm Over Snubbed India Pacer",
+      "summary": "Mohammed Siraj, for the second straight match, finds himself on the sidelines. It makes one wonder whether the veteran pacer is at all in the Indian team management's scheme of things going forward",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/new-zealand-vs-india-2026-27/dont-think-this-will-end-well-for-mohammed-siraj-r-ashwin-sounds-alarm-over-snubbed-india-pacer-12387585#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/ibkjvqglu_siraj_625x300_27_November_26.png?im=FeatureCrop,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 09:35:10 +0530",
+      "published_ts": 1795838710.0,
+      "category": "match_news"
+    },
+    {
+      "title": "IND vs NZ: Has the 'Boom' gone missing? Jasprit Bumrah's dip in pace raises concerns for India",
+      "summary": "The Times of India",
+      "source": "The Times of India",
+      "source_url": "https://news.google.com/rss/articles/CBMilgJBVV95cUxNVTJMVVRsc0pKZVpIT2NsM3RHTDVrc0NlZk9PTFlzU1FSRlV6c0RPOF9OZXJQd1B1SDE0MHBUM0RwNFZ5R3Z2UUhyT1lueWE3VWItQ2JrSnlXLW90R1daRzlQNndCQ2hYM1lBcll4QlNqSEdkSmlTcHFvM0hQZWYzUHMtX0ZFMjk1aEZVLTRieDdiVzhwOVN1OE9tQmdmdUQzYlh1dDdrandqdzhFVG92MlJlbE5vTXFONXViV3ZrZkFGWXpzU1gzSlFxWE1rdzRlRFk4Rko5cUgwQ1ZYWU1vb1R3R0xET2lONUxWNDFXdEhQVXZHVHowTURaNzNCYjVOeHhVeHk4ekJEdVVjOS1sWTd2aHVzd9IBmwJBVV95cUxOZVJia29BMkFkQ1NRWVpfWlVKR1Y4dWZ2dVd2ajZaOThzUTRzd2FsY3VFVW9xZDRlc0JVcnlGamlEa3pmMjhwcHVCb1l1TzhEZGExNE1FdGxDQzBZTmdyak12QnlPY0NwdlFiY2NLdVQ1T1dnZEdPX0lKOC04dENDTTQyTEhZY0ZxRmw5V1c3NDZXVTd1X296S3NXRTRUSGhxbWQ4azNfbXh6b09zcHJFVXF6Y3Y5d3FiUDJiaGZJblZHdUJiUjIyUGVkUnNUZzM5LW43cEk3OGc0bHBjRHJTaEh0c2Rvcm01MHRZajVRaFZ3NnVCeGgwdllXWlJoM2wtTC01bWw4MnQ1VTY0SXJJQmxuajFCaGFoZjRR?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 02:17:00 GMT",
+      "published_ts": 1795832220.0,
+      "category": "match_news"
+    },
+    {
+      "title": "IND vs NZ: Jaiswal dismissed for six-ball duck",
+      "summary": "Sportstar",
+      "source": "Sportstar",
+      "source_url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNeWJ6Slpadm1vV0d6aDVFb05EbkpPLUF5Ni1ERFJQVm9haHpXWTUzS2JScWZENnloZkhNZXVIcFo4OV82ZnpkbTRHTGtKTVFkVm50c2Y4OGRPSVdRSGJBcllxYkp5ZFl4dUJ0bWZCd1hPU2ZjOWtmYWREYUlURUNLdXF5ODM3ZVdoX3dRQmtkaHg5QWxmbC1CT2JiUk0xaGRSdElWVG1QV1ZWOXZ0Njk2RFd0SdIBugFBVV95cUxPVjBJWmEwN1ZzUmlza2pfTTE3ZUhseVJhd01maW45OHJFQTBla1VjOXIzRk1YbWlOeGYyc21BX2dLOC1FTnhIZ0pBaUUwMjlzT3Y4aDlPZmYwNGpzak9LR0dsR0UzdEZNOUZjcU94RHhkcm9jZnVsNEMzVUZOdUdjdDJxN3cyZEU2RTEwSGJJNUFQNGRwZWJQUDdKOXNBcE1VYnlmbm1tT0dEeDVYZncyMG1MM19saG1QVlE?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 01:46:20 GMT",
+      "published_ts": 1795830380.0,
+      "category": "match_news"
+    },
+    {
+      "title": "New Zealand v India - India in New Zealand 2026, 2nd Test - Cricket Score Centre - Live Cricket Scores - ABC News & Headlines – Australian Broadcasting Corporation",
+      "summary": "Latest match report via ABC News & Headlines – Australian Broadcasting Corporation.",
+      "source": "ABC News & Headlines – Australian Broadcasting Corporation",
+      "source_url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQSFRTOF9iTkpzNF92Z0Z6ZjZrbHB2OXl5WWtic3haNDZNRGxpMU5TOWoxeEt1MGRQZFZLNWtQcGw1MDVQY1FGcTZEYWkxeUZRajM0SjdxV24xdmJqcmMxT084aGhSam9vS0RqWDk3ZjJodEJxdXI0Qnl6VTBGeWcwemxrazcxdw?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 00:45:55 GMT",
+      "published_ts": 1795826755.0,
+      "category": "match_news"
+    },
+    {
+      "title": "India in New Zealand Test Series, 1968 schedule, live scores and results",
+      "summary": "Cricbuzz",
+      "source": "Cricbuzz",
+      "source_url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNMEZUVGFZUWF2eWNrWWFncDNGRkl6MUVCQU5uOGg2RDVKRGlCT0hudTI5M1A0OEQ4OG85bjVQNEQ0WUJZSEt1SF9ER20tWHdrUTVNUnAtb2R6WXZxRmd3ZkpRRVJGeTZhWXFUN09Uc3BFdUwwbzU2UUd2RVhTZnRkQTZjQnhhRUxjMTR6eV9ZYmp0Vm5m?oc=5",
+      "image_url": "",
+      "published": "Fri, 27 Nov 2026 14:08:38 GMT",
+      "published_ts": 1795788518.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Latham, Blundell fifties give NZ advantage after hard-fought opening day",
+      "summary": "Bumrah went wicketless after India won the toss and inserted the hosts in Christchurch",
+      "source": "ESPNcricinfo",
+      "source_url": "https://www.cricinfo.com/ci/content/story/1564389.html?ex_cid=OTC-RSS",
+      "image_url": "http://p.imgci.com/db/PICTURES/CMS/425700/425796.jpg",
+      "published": "Fri, 27 Nov 2026 08:35:14 GMT",
+      "published_ts": 1795768514.0,
+      "category": "match_news"
+    },
+    {
+      "title": "SL A storm into final after Croospulle, Jayawardena tons",
+      "summary": "Sri Lanka A posted a commanding win, chasing down India A's 317 with 51 balls to spare",
+      "source": "ESPNcricinfo",
+      "source_url": "https://www.cricinfo.com/ci/content/story/1564343.html?ex_cid=OTC-RSS",
+      "image_url": "http://p.imgci.com/db/PICTURES/CMS/425700/425789.jpg",
+      "published": "Thu, 26 Nov 2026 18:15:43 GMT",
+      "published_ts": 1795716943.0,
+      "category": "match_news"
+    },
+    {
+      "title": "'It's just a question of time': India coach backs wicketless Bumrah, explains pace dip",
+      "summary": "Sairaj Bahutule expressed support for Jasprit Bumrah following his wicketless performance in the Christchurch Test. Bumrah bowled 26 overs without taking a wicket, which raised concerns about his pace. Bahutule noted that Bumrah adjusted hi",
+      "source": "TOI Cricket",
+      "source_url": "https://timesofindia.indiatimes.com/sports/cricket/india-vs-new-zealand/its-just-a-question-of-time-india-coach-backs-bumrah-after-rare-wicketless-outing-explains-dip-in-pace/articleshow/136243793.cms",
+      "image_url": "https://static.toiimg.com/photo/msid-136243850,imgsize-134384.cms",
+      "published": "2026-11-28T15:33:13+05:30",
+      "published_ts": 0.0,
+      "category": "match_news"
+    },
+    {
+      "title": "26 overs, no wickets! Jasprit Bumrah's unwanted Test record vs New Zealand",
+      "summary": "Jasprit Bumrah struggled in the second Test against New Zealand, completing 26 wicketless overs in their first innings. This marked only the third time Bumrah bowled without taking a wicket in a Test innings. Akash Deep stood out for India,",
+      "source": "TOI Cricket",
+      "source_url": "https://timesofindia.indiatimes.com/sports/cricket/india-vs-new-zealand/26-overs-no-wickets-jasprit-bumrahs-unwanted-test-record-against-new-zealand-in-christchurch/articleshow/136236432.cms",
+      "image_url": "https://static.toiimg.com/photo/msid-136236459,imgsize-54129.cms",
+      "published": "2026-11-28T07:21:25+05:30",
+      "published_ts": 0.0,
+      "category": "match_news"
+    },
+    {
+      "title": "'Siraj needs help': Ashwin urges India team to show compassion after repeated snubs",
+      "summary": "R Ashwin emphasized the importance of supporting Mohammed Siraj during his recent team exclusions. He believes that Siraj requires emotional understanding and a guiding figure in the dressing room. Ashwin suggested that a sports psychologis",
+      "source": "TOI Cricket",
+      "source_url": "https://timesofindia.indiatimes.com/sports/cricket/india-vs-new-zealand/siraj-needs-help-r-ashwin-urges-india-team-to-show-compassion-after-pacers-repeated-snubs/articleshow/136235497.cms",
+      "image_url": "https://static.toiimg.com/photo/msid-136235513,imgsize-56634.cms",
+      "published": "2026-11-28T04:56:19+05:30",
+      "published_ts": 0.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Has the 'Boom' gone missing? Bumrah's dip in pace raises concerns for India",
+      "summary": "One of Bumrah’s great gifts has been to rush batters with the zip he gets off the pitch because of his wrist snap and the fact that batters do not get a trigger movement when facing him — his delivery point is ahead of others. What was trou",
+      "source": "TOI Cricket",
+      "source_url": "https://timesofindia.indiatimes.com/sports/cricket/india-vs-new-zealand/ind-vs-nz-has-the-boom-gone-missing-jasprit-bumrahs-dip-in-pace-raises-concerns-for-india/articleshow/136236625.cms",
+      "image_url": "https://static.toiimg.com/photo/msid-136236711,imgsize-52323.cms",
+      "published": "2026-11-28T07:47:38+05:30",
+      "published_ts": 0.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Rohit Sharma back as Mumbai Indians captain; five-time winner to lead MI in IPL 2027",
+      "summary": "Rohit Sharma will return as Mumbai Indians captain for IPL 2027 following Hardik Pandya's trade to Punjab Kings. The five-time IPL-winning skipper, who was replaced by Hardik ahead of the 2024 season, returns to the leadership role after th",
+      "source": "TOI Cricket",
+      "source_url": "https://timesofindia.indiatimes.com/sports/cricket/news/rohit-sharma-back-as-mumbai-indians-captain-five-time-winner-to-lead-mi-in-ipl-2027/articleshow/136221868.cms",
+      "image_url": "https://static.toiimg.com/photo/msid-136222002,imgsize-600680.cms",
+      "published": "2026-11-27T17:49:15+05:30",
+      "published_ts": 0.0,
+      "category": "match_news"
+    },
+    {
+      "title": "'He will win games single-handedly': Ex-cricketer backs Sooryavanshi for ODI World Cup",
+      "summary": "Kris Srikkanth emphasized the potential of teenage cricketer Vaibhav Sooryavanshi for international formats. He urged the Indian team management to include Sooryavanshi in upcoming ODI series against Sri Lanka. Srikkanth believes that Soory",
+      "source": "TOI Cricket",
+      "source_url": "https://timesofindia.indiatimes.com/sports/cricket/news/he-will-win-games-single-handedly-ex-cricketer-backs-vaibhav-sooryavanshi-for-2027-odi-world-cup/articleshow/136226740.cms",
+      "image_url": "https://static.toiimg.com/photo/msid-136227088,imgsize-84388.cms",
+      "published": "2026-11-27T20:58:32+05:30",
+      "published_ts": 0.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Dinesh Karthik Exposes Brutal Reality About India's Fielding: \"We're 8th Among Test Teams\"",
+      "summary": "Dinesh Karthik on Saturday blamed India's poor catching for leaving them in trouble in the ongoing Test against New Zealand, adding that the team's chances of reaching the World Test Championship (WTC) final is slipping out of reach.",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/new-zealand-vs-india-2026-27/dinesh-karthik-exposes-brutal-reality-about-indias-fielding-were-8th-among-test-teams-12388531#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/918ifpmg_india-cricket-team_625x300_26_November_26.jpg?im=FitAndFill,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 17:29:25 +0530",
+      "published_ts": 1795867165.0,
+      "category": "match_news"
+    },
+    {
+      "title": "\"We're Hunting As A Pack\": Jacob Duffy Explains New Zealand's Bowling Masterclass vs India",
+      "summary": "New Zealand speedster Jacob Duffy heaped praise on his fellow bowlers after a strong display against India during Day 2 of the second Test at Hagley Oval on Saturday.",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/new-zealand-vs-india-2026-27/were-hunting-as-a-pack-jacob-duffy-explains-new-zealands-bowling-masterclass-vs-india-12388373#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/b23kljsr5_new-zealand-cricket-team_625x300_28_November_26.jpg?im=FaceCrop,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 17:06:57 +0530",
+      "published_ts": 1795865817.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Super 90 Cricket League schedule, live scores and results",
+      "summary": "Cricbuzz",
+      "source": "Cricbuzz",
+      "source_url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPVmJpWWp2a3JfeTY2NDVBR0w2VWt3alJ4UG1TaFRPRm9Rb1lRUFYzY3l0Qy1vUVB6dkptR19nbFBDVjJWV3lKa1cyYmhpWVZkTkE1aWhaOTFJLUM1TmxoajZzbjd3V2U5NkJvQzlXWGVMZEZnb2VaYXVzcjBib1dvYTZubw?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 11:28:19 GMT",
+      "published_ts": 1795865299.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Rohit Sharma: Mumbai Indians 'needs a direction' right now",
+      "summary": "The new Mumbai Indians captain says he hesitated when he was first offered the job, but is now determined to make the team what it used to be",
+      "source": "ESPNcricinfo",
+      "source_url": "https://www.cricinfo.com/ci/content/story/1564519.html?ex_cid=OTC-RSS",
+      "image_url": "http://p.imgci.com/db/PICTURES/CMS/417300/417359.jpg",
+      "published": "Sat, 28 Nov 2026 10:28:31 GMT",
+      "published_ts": 1795861711.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Rishabh Pant Surpasses Ben Stokes, Breaks Long-Standing WTC Record",
+      "summary": "Rishabh Pant achieved the milestone on the second day of the ongoing Test in Christchurch when he struck a six off fast bowler Jacob Duffy during India's first innings.",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/cricket/rishabh-pant-breaks-long-standing-wtc-record-with-historic-six-in-christchurch-12387816#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/bx73plzec_rishabh-pant_625x300_28_November_26.jpg?im=FitAndFill,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 14:18:50 +0530",
+      "published_ts": 1795855730.0,
+      "category": "match_news"
+    },
+    {
+      "title": "INDW vs ENGW, 11th Match, ICC Womens T20 World Cup Warm-up Matches 2026 - Commentary",
+      "summary": "Cricbuzz",
+      "source": "Cricbuzz",
+      "source_url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOdFp4OEYtNHFLUkYtWExSSmJhclhXOW0wSzlYaG13TVhpaDloNjhpOXZtR01sVHFhdVdqRnYzRUNJcUg2NV9jMUp0eTVQTDdvZ2R2UkNHNDBwWnJ4VnZWNllJNHJqcUVDNGZMRmtBVXEwRVFKYzNmQ2hqbHhJU0FIUHRmZWFPU0lPQlRmWGRlcURKWGNwLXpKTFRIUTB6RjNBQVQxSmFLOVM4OG53dnFpaUtzY3JRbXk1dXhYa3NB?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 08:37:04 GMT",
+      "published_ts": 1795855024.0,
+      "category": "match_news"
+    },
+    {
+      "title": "'Sometimes it works for him, sometimes it doesn't': Team India defend Rishabh Pant",
+      "summary": "Rediff.com",
+      "source": "Rediff.com",
+      "source_url": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxPZWtvVlpVbFFSMzFnN3ZnUkpXMzMxczR5dFlIQ2xWd2p0RDZWS0FFUGEzMWljUHBhU2MxTHZJbWh4U0NFZUs5ZkhZSkZpeFhub3dwd0NoUjNJNGNMR3hMcXlPMnZKUlpvODBVMkNWLWcyT2FUTk1JeVQteEVQVjQxQ1NmN09Lb3RJZDhDZXRCUWc1NVdiVzh0TjZKLWVoTzJqNk1LcWxkcFgtVURHcmxVV1RQbG8wOWFRX1hrMk5wUWJnYW9xV2lRbHR0R2tLQUhPU2Fna0oyWExrdmRYT0RocDRHWGlPZHcyLV90dFdzR0dzcnlnQTlNZDFR0gH8AUFVX3lxTE40Nk94XzZPWnd3SEFWSHlGZlJrS1dGR1dqM1hPRThVZXJ6TGxWMld4SXIzMUhMZFdHQ1RFWFhWRW5tRFl4cGFyb2JhTWR5QS0xaF9ya0cwMy1SX2NoUUtVWFROUnRheURjbmkwd2I2M3hhOEU1VlRmWmZwVnBrcXd2WC1icFFXX0F3OW8yVEZjMlVWd18tbm9aSTJfV0JIVEZkM18zMmhwd3lpV2JZUC1XM0p1dmoySDhyaFc0emdoeWlVRWg1N0l2bGM2WFRJNEtNbVUxTy1qTU1fbUkwWGJWUkxhanRGNngzVmJ4dVJTQVdPaXFaWWxma2RfTg?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 08:02:54 GMT",
+      "published_ts": 1795852974.0,
+      "category": "match_news"
+    },
+    {
+      "title": "\"Didn't Play To Our Potential': Coach Minces No Words After India's Horrific Day In 2nd Test",
+      "summary": "India ended the second day of the second Test at 116/6 in their first innings, trailing New Zealand by 240 runs after the hosts had posted 356.",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/new-zealand-vs-india-2026-27/didnt-play-to-our-potential-coach-minces-no-words-after-indias-horrific-day-in-2nd-test-12388081#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/9a7l0d453_india_625x300_28_November_26.jpg?im=FeatureCrop,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 13:29:43 +0530",
+      "published_ts": 1795852783.0,
+      "category": "match_news"
+    },
+    {
+      "title": "\"Thought I Was Not Prepared\": Rohit Sharma's Reaction On Re-Appointment As MI Captain",
+      "summary": "Indian batting legend Rohit Sharma, re-appointed as Mumbai Indians (MI) captain after three seasons, admitted that he initially felt hesitant and unprepared to take up the armband again.",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/ipl-2027/thought-i-was-not-prepared-rohit-sharmas-reaction-on-re-appointment-as-mi-captain-12388140#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/iny2tt83f_rohit-sharma-getty_625x300_28_November_26.jpg?im=FitAndFill,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 13:22:49 +0530",
+      "published_ts": 1795852369.0,
+      "category": "match_news"
+    },
+    {
+      "title": "India tour of New Zealand, 2nd Test Day 2: India spin bowling coach Sairaj Bahutule addresses the media in Christchurch",
+      "summary": "Cricket World",
+      "source": "Cricket World",
+      "source_url": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxQZnNmRDFtZTV5OG1TOFJsUzZOM25zbkJ5cDYzUkdKTEVOV296RlBWbWF3NTRZc2p3ZXNIaEhITHpBRWlZR2h6NDF1ZHNHdkt6MnFfdlJEdnY0S3A3XzBaWlZtbFBrMC1ScmFfNVJycDJxZjJVRmNHTlZqOHROUTNnT3AzZWNxWDhPdEE3c1NmaUhZS3lmOUVxY1dQdFdOWVpqYmR0alVPYkozbkM2Zkcya2Nvb2VLdV9fbjY2RUJvTnA2Mkc2bExQWlM5ZFVpTVdjY3k1aTdYeVplTE9MZFJyZTlVbkdRb04wWnQ2dmtn?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 07:37:54 GMT",
+      "published_ts": 1795851474.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Rishabh Pant's Costly Error Leaves India In Deep Trouble At Hagley Oval",
+      "summary": "Rishabh Pant once again breached the fine line between responsibility and recklessness with a horrendous shot selection as India huffed and puffed to 116 for six against New Zealand on the second day of the second Test at Hagley Oval on Fri",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/new-zealand-vs-india-2026-27/rishabh-pants-costly-error-leaves-india-in-deep-trouble-at-hagley-oval-12387882#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/ueb87yj2h_rishabh-pant_625x300_28_November_26.jpg?im=FeatureCrop,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 12:58:07 +0530",
+      "published_ts": 1795850887.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Sunil Gavaskar Furious Over India's Missed Opportunity During New Zealand Innings. Watch",
+      "summary": "NDTV Sports",
+      "source": "NDTV Sports",
+      "source_url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxNS2NtcHUzNjJoUUxQc1lNMHdJeEN2Q1V0R0g5Y0FtOG0wMFMxaVRTek1McnBDaDZvU0tIclpWNVFUVXZ1NDFiVGZxbGNpMmY3cDh2OEZKYjUybGhhWGduamN1TFRwamJuME4wTXZKSjNSVE1vNUZlNXIwNTN5cDN4WElBWDhLbkwzNE1JN0stOVJ5dVBFU2tmaFRkWldqd01lb3piZkJ3ZDdVaWRTN2tGcXZVemNkVHlJenhIU3FDdVA1S1gzSGdJMFd4SVladGQzZktIQmY1TTI5dw?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 07:12:16 GMT",
+      "published_ts": 1795849936.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Outclassed Australia search for answers to keep series alive",
+      "summary": "England have shown why they are the No.1-ranked team over the last two matches and could secure the series in Sydney",
+      "source": "ESPNcricinfo",
+      "source_url": "https://www.cricinfo.com/ci/content/story/1564467.html?ex_cid=OTC-RSS",
+      "image_url": "http://p.imgci.com/db/PICTURES/CMS/425800/425824.jpg",
+      "published": "Sat, 28 Nov 2026 05:59:56 GMT",
+      "published_ts": 1795845596.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Akash Deep Joins Elite Indian Pace Club With Historic Five-Wicket Haul In New Zealand",
+      "summary": "NDTV Sports",
+      "source": "NDTV Sports",
+      "source_url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxPeTJMSDZUUGhPQWJ2anVQUnZGb2RYUEVfd3JTUHZscFh1RnM3V2FQUW96OVE1dTgyZkdQOXoxTTZfWGE3RHdoWG5TQ3dMa0VuVGZvUjBYM25XUVpkQlRQRHpoWW9KQXlsR1dWSFV5YmNVVVRxYlJmeXFxUDVETkZja3pYN2xJbWFMMnB3QkRtb3VmZ1l3RkxxZmdnWWEyazhDYVFRV3BzclZoOWVNRnZPVWpLR2RxTjBZNS1TSy1DSjZ1aWFtQUlpaWk0Tm8yV1JnV0dUMURIOFhuc3V3RGlxdw?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 05:57:41 GMT",
+      "published_ts": 1795845461.0,
+      "category": "match_news"
+    },
+    {
+      "title": "India tour of New Zealand, 2nd Test Day 2: Black Caps take control as India trail by 240 runs in Christchurch",
+      "summary": "Cricket World",
+      "source": "Cricket World",
+      "source_url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxQZDRjQ1NYRi1ka2VEc1o5dXVoU19leHpiYzlodkU1TzBBcG0yamo0c2dMeVZBT3F6dFhYbVZSdlNSN1NUb3JJX1RiNmlURWREVWtzRDZJMnpiWURkSG1pb29zU0RlTHhyYU9WaDAtU0NaNHR0d2RtRVNIOGt2OWJRclE3NXVzTGpnbkZOQkpBd1FuaFNiaGd5Vy1Jd1dVMkExZlRzSmtYSlZ6ZndQYmRhRl9yMElodTNuYURNSGw3Q2NGY05RRDNtZU9vSThIZWdvS3JramZubG02bEkydERubw?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 05:53:57 GMT",
+      "published_ts": 1795845237.0,
+      "category": "match_news"
+    },
+    {
+      "title": "Sunil Gavaskar Points Out What Was Missing in Jasprit Bumrah's Christchurch Spell",
+      "summary": "Jasprit Bumrah went wicketless in the first innings of the second Test against New Zealand in Christchurch. The veteran India pacer bowled 26 overs, six of which were maidens, did everything right but did not get a wicket",
+      "source": "NDTV Cricket",
+      "source_url": "https://sports.ndtv.com/new-zealand-vs-india-2026-27/sunil-gavaskar-points-out-what-was-missing-in-jasprit-bumrahs-christchurch-spell-12387899#publisher=newsstand",
+      "image_url": "https://c.ndtvimg.com/2026-11/6w2vkibp4_jasprit-bumrah_625x300_28_November_26.jpg?im=FeatureCrop,algorithm=dnn,width=1280,height=720",
+      "published": "Sat, 28 Nov 2026 11:18:31 +0530",
+      "published_ts": 1795844911.0,
+      "category": "match_news"
+    },
+    {
+      "title": "'Hope it's not the end' - Lyon given path to India, if he wants it",
+      "summary": "Australia's chair of selectors George Bailey all but guaranteed Lyon would tour India but the offspinner is considering his future after being dropped from the series against New Zealand",
+      "source": "ESPNcricinfo",
+      "source_url": "https://www.cricinfo.com/ci/content/story/1564497.html?ex_cid=OTC-RSS",
+      "image_url": "http://p.imgci.com/db/PICTURES/CMS/421300/421375.jpg",
+      "published": "Sat, 28 Nov 2026 03:55:24 GMT",
+      "published_ts": 1795838124.0,
+      "category": "match_news"
+    },
+    {
+      "title": "New Zealand tour of India, 2026 Venues and Grounds",
+      "summary": "Cricbuzz",
+      "source": "Cricbuzz",
+      "source_url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPLUM3QktjeV9oUE1abXdtWHF6al9BaFhhaGVrc19RYmhVaUdldkdoZ2JXTEd2WlVtZGY3U2FjMnhESGtxMTBYcXAyVWJMdVlvQlNoZUdlRXgweUdzLVIxLTBGOHR3dzJvamM1WC1jandSWWJIaVJVY1B1ZXdlT25qdl9iU2lUV0w5RzJj?oc=5",
+      "image_url": "",
+      "published": "Sat, 28 Nov 2026 03:22:13 GMT",
+      "published_ts": 1795836133.0,
+      "category": "match_news"
+    }
+  ]
+}                                                                                                                                                                                                  

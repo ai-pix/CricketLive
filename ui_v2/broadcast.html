@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cricket Live — Interactive Broadcast Scoreboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800&family=Inter:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="broadcast.css?v=65" />
+  <link rel="stylesheet" href="/fx.css?v=2" />
+</head>
+<body>
+  <main class="stage" id="stage">
+    <section class="broadcast-frame" id="broadcastFrame" aria-label="Interactive Cricket Scoreboard">
+      <!-- Stadium Backdrop locked to 16:9 Broadcast Frame (hidden in transparent mode) -->
+      <div class="stadium-backdrop" aria-hidden="true">
+        <div class="stadium-photo"></div>
+        <div class="stadium-vignette"></div>
+        <div class="stadium-glow glow-left"></div>
+        <div class="stadium-glow glow-right"></div>
+      </div>
+
+      <!-- TOP HEADER SCOREBOARD -->
+      <header class="top-bar">
+        <!-- Dark V-shield backdrop seamlessly connecting top panels -->
+        <div class="top-center-backdrop" aria-hidden="true"></div>
+
+        <!-- Left Batting Team Flag (Clickable -> Batting Playing XI) -->
+        <button
+          type="button"
+          class="flag-wing flag-left clickable-element sweep-surface"
+          id="btnBattingFlag"
+          title="Click to view Batting Team Playing XI"
+          aria-label="Open Batting Team Playing XI"
+        >
+          <div class="flag-inner" id="battingFlagSvg"></div>
+          <span class="click-hint">PLAYING XI</span>
+        </button>
+
+        <!-- Left Batting Score Panel -->
+        <div class="score-panel panel-batting sweep-surface">
+          <div class="team-title" id="battingTeamName">BAN-A</div>
+          <div class="main-score live-only-block" id="battingScore">36/2</div>
+          <div class="overs-line live-only-block">
+            <span class="overs-lbl">OVERS:</span>
+            <span class="overs-val" id="battingOvers">12.0</span>
+          </div>
+          <div class="prematch-panel-info" aria-hidden="true">
+            <div class="pm-top-kicker">2ND SEMI-FINAL</div>
+            <div class="pm-top-val" id="pmStartTimeTop">3:30 PM</div>
+          </div>
+        </div>
+
+        <!-- Center Channel Logo / Callout Emblem (Clickable -> Toss Animation) -->
+        <div
+          class="center-emblem clickable-element"
+          id="centerEmblem"
+          role="button"
+          tabindex="0"
+          title="Click to play Toss Animation (or press T)"
+          aria-label="Open Toss Animation"
+        >
+          <div class="channel-logo-wrap sweep-surface">
+            <img class="channel-logo" src="/assets/innings_one_logo.jpg" alt="Innings One" />
+          </div>
+          <div class="event-pill" id="eventPill" aria-live="polite"></div>
+        </div>
+
+        <!-- Right Bowling Team Panel -->
+        <div class="score-panel panel-bowling sweep-surface">
+          <div class="team-title" id="bowlingTeamName">IND</div>
+          <div class="bowling-status live-only-block" id="bowlingStatus">BOWLING</div>
+          <div class="target-sub live-only-block" id="targetSub" style="display: none;"></div>
+          <div class="prematch-panel-info" aria-hidden="true">
+            <div class="pm-top-kicker">STARTS IN</div>
+            <div class="pm-top-val countdown" id="pmCountdownTop">00:26:22</div>
+          </div>
+        </div>
+
+        <!-- Right Bowling Team Flag (Clickable -> Bowling Playing XI) -->
+        <button
+          type="button"
+          class="flag-wing flag-right clickable-element sweep-surface"
+          id="btnBowlingFlag"
+          title="Click to view Bowling Team Playing XI"
+          aria-label="Open Bowling Team Playing XI"
+        >
+          <div class="flag-inner" id="bowlingFlagSvg"></div>
+          <span class="click-hint">PLAYING XI</span>
+        </button>
+      </header>
+
+      <!-- SUB-HEADER STATS STRIP -->
+      <div class="stats-bar sweep-surface">
+        <div class="prematch-marquee" aria-hidden="true">
+          <div class="prematch-marquee-track">
+            <span>SUBSCRIBE TO INNINGS ONE</span><span class="pm-mq-dot"></span>
+            <span>SUBSCRIBE TO INNINGS ONE</span><span class="pm-mq-dot"></span>
+            <span>SUBSCRIBE TO INNINGS ONE</span><span class="pm-mq-dot"></span>
+            <span>SUBSCRIBE TO INNINGS ONE</span><span class="pm-mq-dot"></span>
+            <span>SUBSCRIBE TO INNINGS ONE</span><span class="pm-mq-dot"></span>
+            <span>SUBSCRIBE TO INNINGS ONE</span><span class="pm-mq-dot"></span>
+          </div>
+        </div>
+        <div class="stats-left">
+          <span class="stat-group">
+            <span class="stat-k">P'SHIP:</span>
+            <span class="stat-v" id="statPship">62(122)</span>
+          </span>
+          <span class="stat-divider"></span>
+          <span class="stat-group">
+            <span class="stat-k">CRR:</span>
+            <span class="stat-v" id="statCrr">2.89</span>
+          </span>
+          <span class="stat-divider" id="rrrDivider"></span>
+          <span class="stat-group" id="rrrGroup">
+            <span class="stat-k">RR:</span>
+            <span class="stat-v gold" id="statRrr">0.00</span>
+          </span>
+        </div>
+        <div class="stats-right">
+          <span class="stat-group">
+            <span class="stat-k">BOUNDARIES:</span>
+            <span class="stat-v">4s <strong id="statFours">26</strong></span>
+            <span class="stat-divider small"></span>
+            <span class="stat-v">6s <strong id="statSixes">0</strong></span>
+          </span>
+        </div>
+      </div>
+
+      <!-- OVER-BY-OVER BALL TRACKER (Previous Over + Current Over, Clickable -> Full Scorecard) -->
+      <div class="over-tracker-wrap">
+        <div class="slashes slashes-left" aria-hidden="true"><span></span><span></span></div>
+        <div
+          class="over-pill over-pill-prev clickable-element sweep-surface"
+          id="prevOverPill"
+          role="button"
+          tabindex="0"
+          title="Previous Over — Click to view Full Batting &amp; Bowling Scorecard"
+          aria-label="Previous Over — Open Full Batting and Bowling Scorecard"
+          style="display:none;"
+        >
+          <div class="ov-badge">
+            <span class="ov-lbl">OV</span>
+            <span class="ov-num" id="prevOverNum">11</span>
+          </div>
+          <div class="balls-list" id="prevOverBalls"></div>
+          <div class="ov-total" id="prevOverTotal">= 0</div>
+        </div>
+        <div
+          class="over-pill over-pill-curr clickable-element sweep-surface"
+          id="overTrackerBtn"
+          role="button"
+          tabindex="0"
+          title="Click to view Full Batting &amp; Bowling Scorecard"
+          aria-label="Open Full Batting and Bowling Scorecard"
+        >
+          <div class="ov-badge">
+            <span class="ov-lbl">OV</span>
+            <span class="ov-num" id="currOverNum">85</span>
+          </div>
+          <div class="balls-list" id="currOverBalls"></div>
+          <div class="ov-total" id="currOverTotal">= 1</div>
+        </div>
+        <div class="slashes slashes-right" aria-hidden="true"><span></span><span></span></div>
+      </div>
+
+      <!-- CENTER STAGE SPACER -->
+      <div class="stage-spacer"></div>
+
+      <!-- BOTTOM 3 INTERACTIVE PLAYER CARDS -->
+      <section class="players-row" aria-label="Active Players">
+        <!-- Striker Card -->
+        <article
+          class="p-card p-striker clickable-element"
+          id="cardStriker"
+          tabindex="0"
+          role="button"
+          title="Click for Striker Player Card"
+        >
+          <div class="p-card-bg sweep-surface"></div>
+          <div class="p-portrait-wrap">
+            <div class="p-jersey" id="strikerJersey" aria-hidden="true"></div>
+            <img class="p-portrait" id="strikerImg" alt="" />
+            <div class="p-initials" id="strikerInitials">TB</div>
+          </div>
+          <div class="p-main">
+            <div class="p-top-tag">
+              <span class="mini-flag" id="strikerFlag"></span>
+              <span class="role-badge badge-red">STRIKER</span>
+            </div>
+            <div class="p-name" id="strikerName">TOM BLUNDELL</div>
+            <div class="p-score-line">
+              <span class="p-big" id="strikerRuns">53</span>
+              <span class="p-sub" id="strikerBalls">(117)</span>
+            </div>
+          </div>
+          <div class="p-footer striker-footer">
+            <span>4s: <strong id="striker4s">6</strong></span>
+            <span>6s: <strong id="striker6s">0</strong></span>
+            <span>SR: <strong id="strikerSr">45.30</strong></span>
+          </div>
+          <div class="cricket-bat-stage" aria-hidden="true">
+            <svg class="cricket-bat-svg" viewBox="0 0 64 64" width="60" height="60">
+              <defs>
+                <linearGradient id="willowGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#fef3c7" />
+                  <stop offset="45%" stop-color="#f59e0b" />
+                  <stop offset="100%" stop-color="#b45309" />
+                </linearGradient>
+                <linearGradient id="gripGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#ef4444" />
+                  <stop offset="50%" stop-color="#1e3a8a" />
+                  <stop offset="100%" stop-color="#b91c1c" />
+                </linearGradient>
+              </defs>
+              <!-- Motion trail -->
+              <path d="M12 48 Q26 56 44 50" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round" opacity="0.55" />
+              <g transform="rotate(32 32 34)">
+                <!-- Handle grip -->
+                <rect x="29" y="4" width="6" height="17" rx="2.5" fill="url(#gripGrad)" stroke="#0f172a" stroke-width="1" />
+                <line x1="29.5" y1="8" x2="34.5" y2="8" stroke="#ffffff" stroke-width="1" opacity="0.7" />
+                <line x1="29.5" y1="12" x2="34.5" y2="12" stroke="#ffffff" stroke-width="1" opacity="0.7" />
+                <line x1="29.5" y1="16" x2="34.5" y2="16" stroke="#ffffff" stroke-width="1" opacity="0.7" />
+                <!-- Willow blade -->
+                <path d="M24 21 L40 21 L39 54 Q32 60 25 54 Z" fill="url(#willowGrad)" stroke="#451a03" stroke-width="1.2" />
+                <!-- Center spine highlight -->
+                <path d="M32 22 L32 55" stroke="#fffbeb" stroke-width="2" stroke-linecap="round" opacity="0.65" />
+                <!-- Toe guard -->
+                <path d="M25 51 Q32 56 39 51 L39 54 Q32 60 25 54 Z" fill="#dc2626" opacity="0.9" />
+              </g>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Non-Striker Card -->
+        <article
+          class="p-card p-nonstriker clickable-element"
+          id="cardNonStriker"
+          tabindex="0"
+          role="button"
+          title="Click for Non-Striker Player Card"
+        >
+          <div class="p-card-bg sweep-surface"></div>
+          <div class="p-portrait-wrap">
+            <div class="p-jersey" id="nonStrikerJersey" aria-hidden="true"></div>
+            <img class="p-portrait" id="nonStrikerImg" alt="" />
+            <div class="p-initials" id="nonStrikerInitials">GP</div>
+          </div>
+          <div class="p-main">
+            <div class="p-top-tag">
+              <span class="mini-flag" id="nonStrikerFlag"></span>
+              <span class="role-badge badge-orange">NON-STRIKER</span>
+            </div>
+            <div class="p-name" id="nonStrikerName">GLENN PHILLIPS</div>
+            <div class="p-score-line">
+              <span class="p-big" id="nonStrikerRuns">36</span>
+              <span class="p-sub" id="nonStrikerBalls">(64)</span>
+            </div>
+          </div>
+          <div class="p-footer">
+            <span>4s: <strong id="nonStriker4s">5</strong></span>
+            <span>6s: <strong id="nonStriker6s">0</strong></span>
+            <span>SR: <strong id="nonStrikerSr">56.25</strong></span>
+          </div>
+        </article>
+
+        <!-- Bowler Card -->
+        <article
+          class="p-card p-bowler clickable-element"
+          id="cardBowler"
+          tabindex="0"
+          role="button"
+          title="Click for Bowler Player Card"
+        >
+          <div class="p-card-bg sweep-surface"></div>
+          <div class="p-portrait-wrap">
+            <div class="p-jersey" id="bowlerJersey" aria-hidden="true"></div>
+            <img class="p-portrait" id="bowlerImg" alt="" />
+            <div class="p-initials" id="bowlerInitials">AD</div>
+          </div>
+          <div class="p-main">
+            <div class="p-top-tag">
+              <span class="mini-flag" id="bowlerFlag"></span>
+              <span class="role-badge badge-red">BOWLER</span>
+            </div>
+            <div class="p-name" id="bowlerName">AKASH DEEP</div>
+            <div class="p-score-line">
+              <span class="p-big" id="bowlerFigs">2-52</span>
+              <span class="p-sub" id="bowlerOvers">(21.0)</span>
+            </div>
+          </div>
+          <div class="p-footer bowler-footer">
+            <span>Econ: <strong id="bowlerEcon">2.48</strong></span>
+          </div>
+          <div class="cricket-ball-stage" aria-hidden="true">
+            <video id="ballSourceVideo" src="/assets/ball_green_screen.mp4" loop muted autoplay playsinline preload="auto" style="display: none;"></video>
+            <canvas id="ballKeyedCanvas" class="cricket-ball-canvas" width="128" height="128"></canvas>
+          </div>
+        </article>
+      </section>
+
+      <!-- BOTTOM TICKER -->
+      <footer class="bottom-ticker">
+        <div class="ticker-viewport">
+          <div class="ticker-track" id="tickerTrack"></div>
+        </div>
+      </footer>
+
+      <!-- INTERACTIVE POPUP: PLAYING XI (SLIDES IN FROM BOTTOM BELOW STATS BAR) -->
+      <div class="modal-backdrop xi-backdrop" id="xiModal" hidden>
+        <div class="modal-card xi-modal-card sweep-surface" role="dialog" aria-modal="true" aria-labelledby="xiModalTitle">
+          <button type="button" class="modal-close" data-close="xiModal" aria-label="Close Playing XI">&times;</button>
+          <header class="modal-header">
+            <div class="modal-flag" id="xiModalFlag"></div>
+            <div>
+              <div class="modal-kicker" id="xiModalKicker">BATTING TEAM</div>
+              <h2 class="modal-title" id="xiModalTitle">NEW ZEALAND — PLAYING XI</h2>
+            </div>
+          </header>
+          <div class="xi-grid" id="xiModalGrid"></div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE POPUP: PLAYER CARD (SLIDES IN FROM BOTTOM BELOW STATS BAR) -->
+      <div class="modal-backdrop player-backdrop" id="playerModal" hidden>
+        <div class="modal-card player-modal-card sweep-surface" role="dialog" aria-modal="true" aria-labelledby="pmName">
+          <button type="button" class="modal-close" data-close="playerModal" aria-label="Close Player Card">&times;</button>
+          <div class="pm-layout">
+            <div class="pm-left">
+              <div class="pm-flag" id="pmFlag"></div>
+              <div class="pm-portrait-box">
+                <div class="pm-jersey" id="pmJersey" aria-hidden="true"></div>
+                <img class="pm-portrait" id="pmImg" alt="" />
+                <div class="pm-initials" id="pmInitials">AS</div>
+              </div>
+            </div>
+            <div class="pm-right">
+              <div class="pm-role-pill" id="pmRole">STRIKER</div>
+              <h2 class="pm-name" id="pmName">TOM BLUNDELL</h2>
+              <div class="pm-team-sub" id="pmTeam">NEW ZEALAND</div>
+              <div class="pm-stats-grid" id="pmStatsGrid"></div>
+              <div class="pm-status-bar" id="pmStatus">AT THE CREASE • NOT OUT</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- WICKET OUT OVERLAY (AUTO-CLOSES AFTER 5 SECONDS) -->
+      <div class="wicket-out-backdrop" id="wicketOutOverlay" hidden>
+        <div class="wicket-out-card" role="dialog" aria-modal="true" aria-labelledby="woHeadline">
+          <div class="wo-left">
+            <img class="wo-portrait" id="woImg" alt="" />
+            <div class="wo-initials" id="woInitials">SG</div>
+          </div>
+          <div class="wo-right">
+            <div class="wo-watermark" id="woWatermark" aria-hidden="true">17</div>
+            <div class="wo-top-row">
+              <span class="wo-badge">WICKET</span>
+              <div class="wo-team-pill">
+                <span class="wo-flag" id="woFlag"></span>
+                <span class="wo-team-code" id="woTeamCode">IND</span>
+              </div>
+            </div>
+            <div class="wo-headline" id="woHeadline">OUT FOR 17</div>
+            <div class="wo-player-name" id="woPlayerName">SHUBMAN GILL</div>
+            <div class="wo-dismissal" id="woDismissal">C LATHAM B JAMIESON</div>
+            <div class="wo-stats-row" id="woStatsRow"></div>
+          </div>
+        </div>
+      </div>
+      <!-- INTERACTIVE POPUP: TOSS ANIMATION (SLIDES IN FROM BOTTOM BELOW STATS BAR) -->
+      <div class="modal-backdrop toss-backdrop" id="tossModal" hidden>
+        <div class="modal-card toss-modal-card sweep-surface" role="dialog" aria-modal="true" aria-labelledby="tossModalTitle">
+          <button type="button" class="modal-close" data-close="tossModal" aria-label="Close Toss Animation">&times;</button>
+
+          <header class="toss-header">
+            <div class="toss-kicker">OFFICIAL MATCH TOSS</div>
+            <h2 class="toss-title" id="tossModalTitle">COIN TOSS CEREMONY</h2>
+          </header>
+
+          <div class="toss-stage">
+            <!-- Left Team -->
+            <div class="toss-team-card toss-team-left" id="tossTeamLeft">
+              <div class="toss-winner-badge">TOSS WINNER</div>
+              <div class="toss-team-flag" id="tossFlagLeft"></div>
+              <div class="toss-team-name" id="tossNameLeft">NEW ZEALAND</div>
+              <div class="toss-call-pill" id="tossCallLeft">AWAITING CALL</div>
+            </div>
+
+            <!-- Center 3D Coin Arena -->
+            <div class="toss-coin-arena">
+              <div class="toss-spotlight" aria-hidden="true"></div>
+              <div class="toss-shockwave" aria-hidden="true"></div>
+              <div class="toss-coin-flight" id="tossCoinFlight">
+                <div class="toss-coin-3d" id="tossCoin3d">
+                  <div class="coin-face coin-heads">
+                    <div class="coin-ring">
+                      <span class="coin-crown">&#9733;</span>
+                      <span class="coin-label">HEADS</span>
+                      <span class="coin-sub">CRICKET LIVE</span>
+                    </div>
+                  </div>
+                  <div class="coin-face coin-tails">
+                    <div class="coin-ring">
+                      <span class="coin-crown">&#9830;</span>
+                      <span class="coin-label">TAILS</span>
+                      <span class="coin-sub">CRICKET LIVE</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="toss-coin-shadow" aria-hidden="true"></div>
+              <div class="toss-result-chip" id="tossCoinResult">FLIPPING...</div>
+            </div>
+
+            <!-- Right Team -->
+            <div class="toss-team-card toss-team-right" id="tossTeamRight">
+              <div class="toss-winner-badge">TOSS WINNER</div>
+              <div class="toss-team-flag" id="tossFlagRight"></div>
+              <div class="toss-team-name" id="tossNameRight">INDIA</div>
+              <div class="toss-call-pill" id="tossCallRight">CALLS HEADS</div>
+            </div>
+          </div>
+
+          <div class="toss-decision-bar" id="tossDecisionBar">
+            <div class="toss-decision-kicker">OFFICIAL TOSS RESULT</div>
+            <div class="toss-decision-text" id="tossDecisionText">INDIA WON THE TOSS &amp; ELECTED TO BOWL FIRST</div>
+          </div>
+
+          <div class="toss-controls">
+            <button type="button" class="toss-ctrl-btn primary" id="btnReplayToss">Replay Toss</button>
+            <button type="button" class="toss-ctrl-btn" id="btnSwapTossWinner">Switch Winner</button>
+            <button type="button" class="toss-ctrl-btn" id="btnToggleTossChoice">Choice: BAT</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE POPUP: FULL SCORECARD (SLIDES IN FROM BOTTOM BELOW STATS BAR) -->
+      <div class="modal-backdrop scorecard-backdrop" id="scorecardModal" hidden>
+        <div class="modal-card scorecard-modal-card sweep-surface" role="dialog" aria-modal="true" aria-labelledby="scBattingTeam">
+          <button type="button" class="modal-close" data-close="scorecardModal" aria-label="Close Scorecard">&times;</button>
+
+          <header class="sc-header">
+            <div class="sc-header-left">
+              <div class="sc-flag" id="scBattingFlag"></div>
+              <div>
+                <div class="sc-kicker">INNINGS SCORECARD &amp; MATCH STATUS</div>
+                <h2 class="sc-title" id="scBattingTeam">NEW ZEALAND</h2>
+              </div>
+            </div>
+            <div class="sc-header-right">
+              <div class="sc-total-score" id="scTotalScore">246/5</div>
+              <div class="sc-total-meta" id="scTotalOvers">85.0 OVERS • CRR 2.89</div>
+            </div>
+          </header>
+
+          <div class="sc-grid">
+            <!-- Left: Batting Status (Playing, Out, Yet to Bat) -->
+            <section class="sc-panel sc-batting-panel">
+              <div class="sc-panel-head">
+                <span>BATTING CARD</span>
+                <span class="sc-panel-sub" id="scBattingSummary">2 BATTED • 9 YET TO BAT</span>
+              </div>
+              <div class="sc-table-wrap">
+                <table class="sc-table">
+                  <thead>
+                    <tr>
+                      <th>BATTER</th>
+                      <th>STATUS</th>
+                      <th>R</th>
+                      <th>B</th>
+                      <th>4s</th>
+                      <th>6s</th>
+                      <th>SR</th>
+                    </tr>
+                  </thead>
+                  <tbody id="scBattingBody"></tbody>
+                </table>
+              </div>
+              <div class="sc-yet-box">
+                <div class="sc-yet-title">YET TO BAT</div>
+                <div class="sc-yet-list" id="scYetToBat"></div>
+              </div>
+            </section>
+
+            <!-- Right: Bowling Status (Overs Delivered, Runs, Wickets) -->
+            <section class="sc-panel sc-bowling-panel">
+              <div class="sc-panel-head">
+                <span class="sc-bowl-head-left">
+                  <span class="sc-mini-flag" id="scBowlingFlag"></span>
+                  <span id="scBowlingTeam">INDIA — BOWLING</span>
+                </span>
+                <span class="sc-panel-sub" id="scOversDelivered">85.0 OVERS DELIVERED</span>
+              </div>
+              <div class="sc-table-wrap">
+                <table class="sc-table">
+                  <thead>
+                    <tr>
+                      <th>BOWLER</th>
+                      <th>O</th>
+                      <th>M</th>
+                      <th>R</th>
+                      <th>W</th>
+                      <th>ECON</th>
+                    </tr>
+                  </thead>
+                  <tbody id="scBowlingBody"></tbody>
+                </table>
+              </div>
+              <div class="sc-bowl-footer" id="scBowlFooter">
+                <span>CURRENT BOWLER HIGHLIGHTED</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+      <!-- INTERACTIVE POPUP: PITCH REPORT (SLIDES IN FROM BOTTOM BELOW STATS BAR) -->
+      <div class="modal-backdrop pitch-backdrop" id="pitchModal" hidden>
+        <div class="modal-card pitch-modal-card sweep-surface" role="dialog" aria-modal="true" aria-labelledby="pitchModalTitle">
+          <div class="pitch-bg-layer" aria-hidden="true"></div>
+          <button type="button" class="modal-close" data-close="pitchModal" aria-label="Close Pitch Report">&times;</button>
+
+          <header class="pitch-header">
+            <h2 class="pitch-title" id="pitchModalTitle"><span>PITCH</span> REPORT</h2>
+            <div class="pitch-venue-pill" id="pitchVenuePill">HAGLEY OVAL, CHRISTCHURCH • 2ND TEST</div>
+          </header>
+
+          <div class="pitch-mid-row">
+            <!-- Left: Pitch Type -->
+            <section class="pitch-side-card pitch-type-card">
+              <div class="pitch-card-head">PITCH SURFACE</div>
+              <div class="pitch-surface-art" aria-hidden="true">
+                <div class="surface-soil"></div>
+                <div class="surface-grass"></div>
+                <svg class="surface-cracks" viewBox="0 0 220 60" preserveAspectRatio="none">
+                  <path d="M22 44 L44 34 L62 42 L80 32" fill="none" stroke="rgba(69,26,3,0.7)" stroke-width="2.2" stroke-linecap="round"/>
+                  <path d="M138 40 L158 31 L176 41 L196 35" fill="none" stroke="rgba(69,26,3,0.65)" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="pitch-type-badge" id="pitchTypeBadge">SEAM-FRIENDLY</div>
+              <div class="pitch-type-desc" id="pitchTypeDesc">GOOD BOUNCE &amp; CARRY • EARLY MOVEMENT FOR QUICKS</div>
+            </section>
+
+            <!-- Right: Key Insights -->
+            <section class="pitch-side-card pitch-insights-card">
+              <div class="pitch-card-head">KEY INSIGHTS</div>
+              <div class="pitch-insight-list">
+                <div class="pitch-insight-row">
+                  <span class="pi-icon gold">&#9876;</span>
+                  <div>
+                    <div class="pi-k">AVG / EXPECTED SCORE</div>
+                    <div class="pi-v" id="pitchExpectedScore">255 - 275</div>
+                  </div>
+                </div>
+                <div class="pitch-insight-row">
+                  <span class="pi-icon blue">&#9650;</span>
+                  <div>
+                    <div class="pi-k">HIGHEST TOTAL</div>
+                    <div class="pi-v" id="pitchHighestScore">318 / 6</div>
+                  </div>
+                </div>
+                <div class="pitch-insight-row">
+                  <span class="pi-icon red">&#9660;</span>
+                  <div>
+                    <div class="pi-k">LOWEST TOTAL</div>
+                    <div class="pi-v" id="pitchLowestScore">142 ALL OUT</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="pitch-bottom-row">
+            <div class="pitch-stat-card pacers">
+              <div class="ps-head">PACERS</div>
+              <div class="ps-body">
+                <div class="ps-metric">
+                  <span class="ps-pct" id="pitchPacerPct">54%</span>
+                  <span class="ps-sub">WICKETS</span>
+                </div>
+                <div class="ps-note" id="pitchPacerNote">EARLY SEAM &amp; EXTRA BOUNCE WITH NEW BALL</div>
+              </div>
+              <div class="ps-bar"><span data-target="54%"></span></div>
+            </div>
+
+            <div class="pitch-stat-card spinners">
+              <div class="ps-head">SPINNERS</div>
+              <div class="ps-body">
+                <div class="ps-metric">
+                  <span class="ps-pct" id="pitchSpinnerPct">46%</span>
+                  <span class="ps-sub">WICKETS</span>
+                </div>
+                <div class="ps-note" id="pitchSpinnerNote">GRIP &amp; TURN IN MIDDLE OVERS</div>
+              </div>
+              <div class="ps-bar"><span data-target="46%"></span></div>
+            </div>
+
+            <div class="pitch-stat-card boundary">
+              <div class="ps-head">BOUNDARY SIZE</div>
+              <div class="ps-body">
+                <div class="ps-metric">
+                  <span class="ps-pct boundary-val" id="pitchBoundarySize">65-70m</span>
+                  <span class="ps-sub">AVG DIMENSION</span>
+                </div>
+                <div class="ps-oval" aria-hidden="true"><span></span></div>
+              </div>
+              <div class="ps-bar"><span data-target="72%"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE POPUP: WEATHER REPORT (SLIDES IN FROM BOTTOM BELOW STATS BAR) -->
+      <div class="modal-backdrop weather-backdrop" id="weatherModal" hidden>
+        <div class="modal-card weather-modal-card sweep-surface" role="dialog" aria-modal="true" aria-labelledby="weatherModalTitle">
+          <div class="weather-bg-layer" aria-hidden="true"></div>
+          <div class="weather-sky-anim" aria-hidden="true">
+            <div class="w-cloud c1"></div>
+            <div class="w-cloud c2"></div>
+            <div class="w-cloud c3"></div>
+          </div>
+          <button type="button" class="modal-close" data-close="weatherModal" aria-label="Close Weather Report">&times;</button>
+
+          <header class="pitch-header">
+            <h2 class="pitch-title" id="weatherModalTitle"><span>WEATHER</span> REPORT</h2>
+            <div class="pitch-venue-pill" id="weatherVenuePill">HAGLEY OVAL, CHRISTCHURCH • 2ND TEST</div>
+          </header>
+
+          <div class="weather-mid-row">
+            <!-- Hero Temperature & Condition -->
+            <section class="weather-hero-card">
+              <div class="weather-orb-wrap" aria-hidden="true">
+                <div class="weather-sun-rays"></div>
+                <div class="weather-sun-core"></div>
+                <div class="weather-orb-cloud"></div>
+              </div>
+              <div class="weather-hero-info">
+                <div class="weather-temp-row">
+                  <span class="weather-temp" id="weatherTemp">27°C</span>
+                  <span class="weather-feels" id="weatherFeels">FEELS LIKE 28°C</span>
+                </div>
+                <div class="weather-cond-badge" id="weatherCondBadge">CLEAR &amp; BREEZY</div>
+                <div class="weather-status-note" id="weatherStatusNote">ZERO RAIN THREAT • UNINTERRUPTED PLAY EXPECTED</div>
+              </div>
+            </section>
+
+            <!-- Hourly Match Forecast -->
+            <section class="weather-forecast-card">
+              <div class="pitch-card-head">MATCH HOURS FORECAST</div>
+              <div class="weather-hours-grid" id="weatherHoursGrid">
+                <div class="wh-slot">
+                  <span class="wh-time">NOW</span>
+                  <span class="wh-icon">&#9728;</span>
+                  <span class="wh-temp">27°C</span>
+                </div>
+                <div class="wh-slot">
+                  <span class="wh-time">+2 HRS</span>
+                  <span class="wh-icon">&#9925;</span>
+                  <span class="wh-temp">25°C</span>
+                </div>
+                <div class="wh-slot">
+                  <span class="wh-time">+4 HRS</span>
+                  <span class="wh-icon">&#9790;</span>
+                  <span class="wh-temp">23°C</span>
+                </div>
+              </div>
+              <div class="weather-dew-pill" id="weatherDewPill">DEW FACTOR: LOW TO MODERATE LATER</div>
+            </section>
+          </div>
+
+          <div class="pitch-bottom-row">
+            <div class="pitch-stat-card pacers">
+              <div class="ps-head">HUMIDITY</div>
+              <div class="ps-body">
+                <div class="ps-metric">
+                  <span class="ps-pct" id="weatherHumidityPct">56%</span>
+                  <span class="ps-sub">RELATIVE</span>
+                </div>
+                <div class="ps-note" id="weatherHumidityNote">COMFORTABLE • MILD DEW POSSIBLE IN 2ND INNINGS</div>
+              </div>
+              <div class="ps-bar"><span data-target="56%"></span></div>
+            </div>
+
+            <div class="pitch-stat-card boundary">
+              <div class="ps-head">WIND SPEED</div>
+              <div class="ps-body">
+                <div class="ps-metric">
+                  <span class="ps-pct boundary-val" id="weatherWindVal">14 KM/H</span>
+                  <span class="ps-sub" id="weatherWindDir">NW BREEZE</span>
+                </div>
+                <div class="ps-wind-rotor" aria-hidden="true"><span></span></div>
+              </div>
+              <div class="ps-bar"><span data-target="42%"></span></div>
+            </div>
+
+            <div class="pitch-stat-card spinners">
+              <div class="ps-head">RAIN CHANCE</div>
+              <div class="ps-body">
+                <div class="ps-metric">
+                  <span class="ps-pct" id="weatherRainPct">5%</span>
+                  <span class="ps-sub">PROBABILITY</span>
+                </div>
+                <div class="ps-note" id="weatherRainNote">CLEAR SKIES • NO WEATHER DELAY EXPECTED</div>
+              </div>
+              <div class="ps-bar"><span data-target="5%"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BEFORE-THE-TOSS / PRE-MATCH OVERLAY (FILLS COMP BELOW BLANK STATS BAR) -->
+      <section class="prematch-overlay" id="prematchOverlay" hidden aria-label="Pre-Match Countdown">
+        <div class="prematch-bg-tint" aria-hidden="true"></div>
+
+        <!-- Bottom-Left & Bottom-Right Captain Cutouts -->
+        <div class="prematch-captain-art left" aria-hidden="true">
+          <img id="pmCaptainImgLeft" alt="" />
+        </div>
+        <div class="prematch-captain-art right" aria-hidden="true">
+          <img id="pmCaptainImgRight" alt="" />
+        </div>
+
+        <!-- Center Waving Flags + VS -->
+        <div class="prematch-matchup">
+          <div class="prematch-side left">
+            <div class="waving-flag-box" id="pmWaveFlagLeft"></div>
+            <div class="prematch-team-name" id="pmTeamLeft">NEW ZEALAND</div>
+            <div class="prematch-captain-lbl">CAPTAIN</div>
+            <div class="prematch-captain-name" id="pmCaptainLeft">TOM LATHAM</div>
+          </div>
+
+          <div class="prematch-vs-ring">
+            <div class="prematch-vs-orbit" aria-hidden="true"></div>
+            <div class="prematch-vs-badge">VS</div>
+          </div>
+
+          <div class="prematch-side right">
+            <div class="waving-flag-box" id="pmWaveFlagRight"></div>
+            <div class="prematch-team-name" id="pmTeamRight">INDIA</div>
+            <div class="prematch-captain-lbl">CAPTAIN</div>
+            <div class="prematch-captain-name" id="pmCaptainRight">SHUBMAN GILL</div>
+          </div>
+        </div>
+
+        <!-- Bottom Match Name, Venue & Countdown Pill -->
+        <div class="prematch-venue-card sweep-surface">
+          <div class="prematch-match-title" id="pmMatchTitle">INDIA TOUR OF NEW ZEALAND 2026 • 2ND TEST</div>
+          <div class="prematch-venue-name" id="pmVenueName">HAGLEY OVAL, CHRISTCHURCH</div>
+          <div class="prematch-time-row">
+            <span class="pm-date-time" id="pmDateTime">TODAY • 3:30 AM IST</span>
+            <span class="pm-countdown-pill">STARTS IN <strong id="pmCountdownBottom">00:26:22</strong></span>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- Floating Quick Controls (hover bottom-right or press C / ?controls=1) -->
+    <div class="quick-controls" id="quickControls">
+      <button type="button" class="qc-btn" id="btnTogglePrematch">Pre-Match: OFF</button>
+      <button type="button" class="qc-btn" id="btnPitchReport">Pitch Report</button>
+      <button type="button" class="qc-btn" id="btnWeatherReport">Weather</button>
+      <button type="button" class="qc-btn" id="btnPlayToss">Toss</button>
+      <button type="button" class="qc-btn" id="btnTogglePreview">Reference Match: OFF</button>
+      <button type="button" class="qc-btn" id="btnToggleTransparent">OBS Transparent: OFF</button>
+      <a class="qc-btn" href="/prematch.html">All Slides</a>
+      <a class="qc-btn" href="/director.html">Director</a>
+      <a class="qc-btn" href="/v1/">Classic UI</a>
+    </div>
+  </main>
+
+  <script src="/fx.js?v=2"></script>
+  <script src="broadcast.js?v=65"></script>
+</body>
+</html>

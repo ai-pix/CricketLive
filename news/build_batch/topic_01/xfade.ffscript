@@ -1,0 +1,4 @@
+[0:v][1:v]xfade=transition=slideleft:duration=0.450:offset=15.483[v00];
+[v00][2:v]xfade=transition=smoothleft:duration=0.450:offset=30.967[v01];
+[v01][3:v]xfade=transition=slideright:duration=0.450:offset=46.450[vjoined];
+[vjoined]fade=t=in:st=0:d=0.25,fade=t=out:st=61.500:d=0.45,format=yuv420p[vfinal]

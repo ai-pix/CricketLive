@@ -5,13 +5,14 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import sys
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
-from fastapi.responses import JSONResponse, Response
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from .audio_pipeline import CommentaryPipeline
@@ -39,6 +40,13 @@ from .sources import get_source_mode, run_cricapi_poller, run_playwright_reader,
 load_dotenv()
 
 UI_DIR = Path(__file__).resolve().parents[2] / "ui"
+UI_V2_DIR = Path(__file__).resolve().parents[2] / "ui_v2"
+ROOT_DIR = Path(__file__).resolve().parents[2]
+NEWS_DIR = ROOT_DIR / "news"
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+from news.fetcher import fetch_all_cricket_news, load_cached_news
 
 
 class ConnectionManager:
@@ -172,11 +180,8 @@ async def _check_and_emit_milestones(prev: ScoreboardState | None, curr: Scorebo
                     )
                 )
                 hindi_name = batter.name.title()
-                await _speak_and_broadcast(
-                    [
-                        ("host", f"शानदार मील का पत्थर! {hindi_name} ने {m} रन पूरे कर लिए हैं!"),
-                        ("expert", f"लाजवाब पारी भाई! पूरा स्टेडियम खड़ा होकर तालियाँ बजा रहा है!"),
-                    ]
+                commentary_engine.queue_milestone_turn(
+                    f"शानदार मील का पत्थर! {hindi_name} ने {m} रन पूरे कर लिए हैं — लाजवाब पारी, पूरा स्टेडियम तालियाँ बजा रहा है!"
                 )
                 break
 
@@ -191,12 +196,60 @@ async def _auto_switch_on_transition(prev: ScoreboardState | None, curr: Scorebo
     return
 
 
+_last_fx_sig: tuple[int, int, str, str] | None = None
+
+
+async def _check_and_emit_event_fx(prev: ScoreboardState | None, curr: ScoreboardState) -> None:
+    global _last_fx_sig
+    if prev is None:
+        return
+    if prev.runs == curr.runs and prev.wickets == curr.wickets and prev.overs == curr.overs and prev.callout_tone == curr.callout_tone:
+        return
+
+    score_diff = curr.runs - prev.runs
+    wicket_fell = curr.wickets > prev.wickets
+    overs_changed = curr.overs != prev.overs
+    last_ball = (curr.curr_over.balls[-1].upper() if curr.curr_over.balls else "")
+    tone = (curr.callout_tone or "").lower()
+
+    event = ""
+    subtitle = ""
+    if wicket_fell or (overs_changed and (last_ball == "W" or tone == "wicket")):
+        event = "WICKET"
+        subtitle = f"{curr.bowler.name} • {curr.runs}/{curr.wickets}"
+    elif score_diff >= 6 or (overs_changed and (last_ball == "6" or tone == "six")):
+        event = "SIX"
+        subtitle = f"{curr.striker.name} • {curr.runs}/{curr.wickets}"
+    elif score_diff == 4 or (overs_changed and (last_ball == "4" or tone == "four")):
+        event = "FOUR"
+        subtitle = f"{curr.striker.name} • {curr.runs}/{curr.wickets}"
+
+    if not event:
+        return
+    sig = (curr.runs, curr.wickets, curr.overs, event)
+    if sig == _last_fx_sig:
+        return
+    _last_fx_sig = sig
+    await manager.broadcast_text(json.dumps({"type": "event_fx", "event": event, "subtitle": subtitle}))
+
+
+async def _delayed_ui_sync(snapshot_prev: ScoreboardState | None, snapshot_curr: ScoreboardState) -> None:
+    """Delay UI state & FX broadcast until the live ball's voice audio starts (max 3.5s safety cap)."""
+    commentary_engine._ball_audio_synced.clear()
+    try:
+        await asyncio.wait_for(commentary_engine._ball_audio_synced.wait(), timeout=3.5)
+    except asyncio.TimeoutError:
+        pass
+    await manager.broadcast(snapshot_curr)
+    await _check_and_emit_event_fx(snapshot_prev, snapshot_curr)
+    await _check_and_emit_milestones(snapshot_prev, snapshot_curr)
+
+
 async def broadcast_state(new_state: ScoreboardState) -> None:
     global prev_state
     snapshot_prev = prev_state
     snapshot_curr = new_state.model_copy(deep=True)
     prev_state = snapshot_curr
-    await manager.broadcast(new_state)
     if snapshot_prev is None or (
         snapshot_prev.runs != snapshot_curr.runs
         or snapshot_prev.wickets != snapshot_curr.wickets
@@ -211,8 +264,32 @@ async def broadcast_state(new_state: ScoreboardState) -> None:
             snapshot_curr.live_commentary,
         )
     asyncio.create_task(_auto_switch_on_transition(snapshot_prev, snapshot_curr))
-    asyncio.create_task(_emit_commentary(snapshot_prev, snapshot_curr))
-    asyncio.create_task(_check_and_emit_milestones(snapshot_prev, snapshot_curr))
+    await _emit_commentary(snapshot_prev, snapshot_curr)
+
+    is_ball_change = bool(
+        snapshot_prev is not None
+        and (
+            snapshot_prev.runs != snapshot_curr.runs
+            or snapshot_prev.wickets != snapshot_curr.wickets
+            or snapshot_prev.overs != snapshot_curr.overs
+        )
+    )
+    voice_sync_active = (not commentary_engine.paused) and bool(manager.active)
+    if voice_sync_active and is_ball_change:
+        asyncio.create_task(_delayed_ui_sync(snapshot_prev, snapshot_curr))
+    else:
+        await manager.broadcast(new_state)
+        asyncio.create_task(_check_and_emit_event_fx(snapshot_prev, snapshot_curr))
+        asyncio.create_task(_check_and_emit_milestones(snapshot_prev, snapshot_curr))
+
+    if (
+        snapshot_prev is not None
+        and _has_toss_result(snapshot_curr.toss)
+        and not _has_toss_result(snapshot_prev.toss)
+    ):
+        asyncio.create_task(
+            broadcast_control({"type": "toss_trigger", "toss": snapshot_curr.toss})
+        )
 
 
 active_match_url: str = ""
@@ -229,12 +306,37 @@ async def _run_crex_live_loop(url: str, interval_sec: float = 20.0) -> None:
             await asyncio.sleep(5.0)
 
 
+async def _news_refresh_loop(interval_sec: float = 600.0) -> None:
+    while True:
+        try:
+            q = f"{state.batting_team} {state.bowling_team}".strip()
+            terms = [state.batting_team, state.bowling_team, state.series_name, "semi final", "live", "win", "wickets"]
+            payload = await fetch_all_cricket_news(match_query=q, focus_terms=terms, max_items=50)
+            if payload.get("items"):
+                state.latest_news = [
+                    {
+                        "title": it["title"],
+                        "summary": it.get("summary", ""),
+                        "source": it.get("source", "NEWS"),
+                        "source_url": it.get("source_url", ""),
+                    }
+                    for it in payload["items"][:12]
+                ]
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            print(f"[news_loop] error: {exc}")
+        await asyncio.sleep(interval_sec)
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     global source_task, active_match_url
     init_db()
     seed_default_stories()
-    cached_state = load_latest_match_state()
+    mode = get_source_mode()
+    crex_url = os.getenv("CREX_LIVE_URL", "").strip()
+    cached_state = load_latest_match_state(crex_url or None)
     if cached_state:
         try:
             loaded = ScoreboardState.model_validate(cached_state)
@@ -243,8 +345,6 @@ async def lifespan(_: FastAPI):
         except Exception:
             pass
 
-    mode = get_source_mode()
-    crex_url = os.getenv("CREX_LIVE_URL", "").strip()
     if crex_url:
         active_match_url = crex_url
         source_task = asyncio.create_task(_run_crex_live_loop(crex_url))
@@ -276,6 +376,7 @@ async def lifespan(_: FastAPI):
 
     filler_interval = float(os.getenv("FILLER_INTERVAL_SEC", "22"))
     filler_task = asyncio.create_task(_filler_loop(interval=filler_interval))
+    news_task = asyncio.create_task(_news_refresh_loop(interval_sec=600.0))
 
     try:
         yield
@@ -283,6 +384,7 @@ async def lifespan(_: FastAPI):
         if source_task:
             source_task.cancel()
         filler_task.cancel()
+        news_task.cancel()
 
 
 app = FastAPI(title="Cricket Live Scoreboard", lifespan=lifespan)
@@ -292,7 +394,7 @@ app = FastAPI(title="Cricket Live Scoreboard", lifespan=lifespan)
 async def _no_cache_ui_middleware(request, call_next):
     resp = await call_next(request)
     path = request.url.path.lower()
-    if path == "/" or path.endswith((".html", ".js", ".css")):
+    if path in ("/", "/v1", "/v1/", "/v2", "/v2/") or path.endswith((".html", ".js", ".css")):
         resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     return resp
 
@@ -381,6 +483,10 @@ async def connect_crex_live(body: dict[str, str]) -> JSONResponse:
         source_task.cancel()
     if demo_task and not demo_task.done():
         demo_task.cancel()
+    if url != active_match_url:
+        fresh = ScoreboardState()
+        for field_name in fresh.model_fields:
+            setattr(state, field_name, getattr(fresh, field_name))
     active_match_url = url
     summary = await sync_crex_match_once(url, state)
     await broadcast_state_only(state)
@@ -390,7 +496,34 @@ async def connect_crex_live(body: dict[str, str]) -> JSONResponse:
 
 @app.get("/api/news")
 async def api_news() -> JSONResponse:
-    return JSONResponse({"news": get_news_items(limit=20)})
+    cached = load_cached_news()
+    return JSONResponse(
+        {
+            "items": cached.get("items", []),
+            "sources": cached.get("sources", {}),
+            "fetched_at": cached.get("fetched_at", ""),
+            "news": get_news_items(limit=30),
+        }
+    )
+
+
+@app.post("/api/news/refresh")
+async def api_news_refresh() -> JSONResponse:
+    q = f"{state.batting_team} {state.bowling_team}".strip()
+    terms = [state.batting_team, state.bowling_team, state.series_name, "semi final", "live", "win", "wickets"]
+    payload = await fetch_all_cricket_news(match_query=q, focus_terms=terms, max_items=50)
+    if payload.get("items"):
+        state.latest_news = [
+            {
+                "title": it["title"],
+                "summary": it.get("summary", ""),
+                "source": it.get("source", "NEWS"),
+                "source_url": it.get("source_url", ""),
+            }
+            for it in payload["items"][:12]
+        ]
+        await broadcast_state_only(state)
+    return JSONResponse(payload)
 
 
 @app.get("/api/player-images")
@@ -433,6 +566,14 @@ async def update_toss(body: dict[str, object]) -> JSONResponse:
     state.callout = state.toss[:34]
     save_match_state(active_match_url or "ind-a-vs-sl-a-semi-final", state.model_dump())
     await broadcast_state_only(state)
+    await broadcast_control(
+        {
+            "type": "toss_trigger",
+            "winner": winner,
+            "decision": decision,
+            "toss": state.toss,
+        }
+    )
     if body.get("show_slide", True):
         await broadcast_control({"type": "slide", "url": "/toss.html", "priority": True})
     return JSONResponse({"status": "updated", "toss": state.toss})
@@ -454,6 +595,22 @@ async def remote_control(body: dict[str, object]) -> JSONResponse:
     if action == "crowd_toggle":
         await broadcast_control({"type": "crowd_toggle"})
         return JSONResponse({"status": "ok", "action": "crowd_toggle"})
+    if action == "toss":
+        await broadcast_control(
+            {
+                "type": "toss_trigger",
+                "winner": str(body.get("winner") or "").strip().upper(),
+                "decision": str(body.get("decision") or "").strip().upper(),
+                "toss": str(body.get("toss") or state.toss or "").strip().upper(),
+            }
+        )
+        return JSONResponse({"status": "ok", "action": "toss"})
+    if action == "toss_close":
+        await broadcast_control({"type": "toss_close"})
+        return JSONResponse({"status": "ok", "action": "toss_close"})
+    if action in ("prematch", "pitch", "weather", "scorecard", "modal_close"):
+        await broadcast_control({"type": f"v2_{action}", "enabled": body.get("enabled")})
+        return JSONResponse({"status": "ok", "action": action})
     raise HTTPException(status_code=400, detail="Unsupported action")
 
 
@@ -524,14 +681,14 @@ async def speak_commentary(body: dict[str, str]) -> JSONResponse:
     text = (body.get("text") or "").strip()
     if not text:
         raise HTTPException(status_code=400, detail="Missing 'text'")
-    audio_bytes = await synthesize_fish_audio(text)
+    audio_bytes = await synthesize_fish_audio(text, speaker="expert")
     audio_url = None
     if audio_bytes:
         clip_counter += 1
         commentary_clips[clip_counter] = audio_bytes
         audio_url = f"/api/commentary/audio/{clip_counter}"
     await manager.broadcast_text(
-        json.dumps({"type": "commentary", "text": text, "audio_url": audio_url})
+        json.dumps({"type": "commentary", "speaker": "expert", "text": text, "audio_url": audio_url})
     )
     return JSONResponse({"text": text, "audio_url": audio_url})
 
@@ -547,4 +704,51 @@ async def websocket_endpoint(ws: WebSocket) -> None:
         manager.disconnect(ws)
 
 
-app.mount("/", StaticFiles(directory=str(UI_DIR), html=True), name="ui")
+class LayeredStaticFiles(StaticFiles):
+    """Serve static files from ordered directories so UI v2 overrides UI v1 while sharing assets/slides."""
+
+    def __init__(self, directories: list[Path], **kwargs: object) -> None:
+        layer_dirs = [d for d in directories if d.exists()]
+        primary = layer_dirs[0] if layer_dirs else directories[0]
+        super().__init__(directory=str(primary), **kwargs)
+        self.all_directories = [str(d) for d in layer_dirs]
+
+
+def _ui_v2_entry_path() -> Path:
+    for candidate in (UI_V2_DIR / "broadcast.html", UI_V2_DIR / "index.html", UI_DIR / "index.html"):
+        if candidate.exists():
+            return candidate
+    raise HTTPException(status_code=404, detail="UI entry page not found")
+
+
+def _redirect_with_query(request: Request, target_path: str) -> RedirectResponse:
+    target = target_path + (f"?{request.url.query}" if request.url.query else "")
+    return RedirectResponse(url=target, status_code=307)
+
+
+@app.get("/")
+async def ui_root() -> FileResponse:
+    return FileResponse(_ui_v2_entry_path())
+
+
+@app.get("/v2")
+async def ui_v2_redirect(request: Request) -> RedirectResponse:
+    return _redirect_with_query(request, "/v2/")
+
+
+@app.get("/v2/")
+async def ui_v2_root() -> FileResponse:
+    return FileResponse(_ui_v2_entry_path())
+
+
+@app.get("/v1")
+async def ui_v1_redirect(request: Request) -> RedirectResponse:
+    return _redirect_with_query(request, "/v1/")
+
+
+if NEWS_DIR.exists():
+    app.mount("/news-portal", StaticFiles(directory=str(NEWS_DIR), html=True), name="news-portal")
+if UI_V2_DIR.exists():
+    app.mount("/v2", LayeredStaticFiles([UI_V2_DIR, UI_DIR], html=True), name="ui-v2")
+app.mount("/v1", StaticFiles(directory=str(UI_DIR), html=True), name="ui-v1")
+app.mount("/", LayeredStaticFiles([UI_V2_DIR, UI_DIR], html=True), name="ui")

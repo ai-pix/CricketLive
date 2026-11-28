@@ -1,0 +1,6 @@
+[0:a]aresample=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=mono[a0];
+anullsrc=r=48000:cl=mono:d=0.280[s0];
+[1:a]aresample=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=mono[a1];
+anullsrc=r=48000:cl=mono:d=0.280[s1];
+[2:a]aresample=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=mono[a2];
+[a0][s0][a1][s1][a2]concat=n=5:v=0:a=1,loudnorm=I=-16:TP=-1.5:LRA=9[aout]

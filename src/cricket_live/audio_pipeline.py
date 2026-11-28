@@ -13,6 +13,7 @@ from .commentary_director import (
     DirectedTurn,
     NoRepeatDeck,
     build_live_ball_turns,
+    build_live_ball_turns_async,
     build_next_segment,
     build_next_segment_async,
 )
@@ -56,6 +57,9 @@ class CommentaryPipeline:
         self.paused = False
 
         self._priority_events: list[tuple[ScoreboardState | None, ScoreboardState]] = []
+        self._priority_turns: list[DirectedTurn] = []
+        self._major_interrupt_pending = False
+        self._ball_audio_synced = asyncio.Event()
         self._active_turns: list[DirectedTurn] = []
         self._interrupt_event = asyncio.Event()
         self._last_spoken_ball_id = ""
@@ -70,9 +74,19 @@ class CommentaryPipeline:
         self._current_speaker = "none"
         self._current_slide = "/"
 
+    def queue_milestone_turn(self, text: str) -> None:
+        """Queue a milestone call through the single Expert pipeline without overlapping."""
+        if self.paused or not text:
+            return
+        self._priority_turns.append(("expert", text, "live_milestone"))
+        self._major_interrupt_pending = True
+        self._interrupt_event.set()
+
     def pause(self) -> None:
         self.paused = True
         self._priority_events.clear()
+        self._priority_turns.clear()
+        self._major_interrupt_pending = False
         self._active_turns.clear()
         self._interrupt_event.set()
         self._current_tag = "paused"
@@ -122,6 +136,16 @@ class CommentaryPipeline:
         )
         if not changed:
             return
+        # Ignore stale backward snapshots from CREX (e.g. 21/1 (3.2) -> 20/1 (3.1)) within the same innings
+        if prev.batting_team == curr.batting_team:
+            def _ov_tuple(ov: str) -> tuple[int, int]:
+                parts = str(ov or "0.0").split(".")
+                try:
+                    return (int(parts[0] or 0), int(parts[1] or 0) if len(parts) > 1 else 0)
+                except Exception:
+                    return (0, 0)
+            if _ov_tuple(curr.overs) < _ov_tuple(prev.overs) or curr.runs < prev.runs or curr.wickets < prev.wickets:
+                return
         if curr.live_commentary:
             self._last_crex_raw = curr.live_commentary
             self._seen_crex_raws.add(curr.live_commentary)
@@ -131,11 +155,26 @@ class CommentaryPipeline:
             "BALL_EVENT",
             f"{prev.runs}/{prev.wickets} ({prev.overs}) -> {curr.runs}/{curr.wickets} ({curr.overs}) crex={new_crex}",
         )
-        self._priority_events.append((prev, curr))
-        self._interrupt_event.set()
+        # Keep only the latest pending ball event so rapid dot balls don't pile up
+        if self._priority_events:
+            first_prev, _ = self._priority_events[0]
+            self._priority_events = [(first_prev, curr)]
+        else:
+            self._priority_events.append((prev, curr))
+
+        last_ball = (curr.curr_over.balls[-1].upper() if curr.curr_over.balls else "")
+        is_major_event = (
+            curr.wickets > prev.wickets
+            or (curr.runs - prev.runs) >= 4
+            or last_ball in ("4", "6", "W")
+        )
+        if is_major_event:
+            self._major_interrupt_pending = True
+            self._interrupt_event.set()
 
     async def _synthesize_turn(self, turn: DirectedTurn) -> tuple[str | None, float]:
         speaker, text, tag = turn
+        speaker = "expert"
         if tag in ("live_wicket", "live_wicket_analysis", "live_six", "live_six_analysis", "live_four", "live_four_analysis"):
             mood = "excited"
         elif tag in ("live_dot", "live_run", "live_crex_ball"):
@@ -157,10 +196,14 @@ class CommentaryPipeline:
         *,
         interruptible: bool = True,
         slide_url: str | None = None,
+        sync_state: ScoreboardState | None = None,
     ) -> tuple[bool, asyncio.Task | None]:
         """Broadcast slide (synced to speech start) + turn audio, and prefetch next turn concurrently."""
-        speaker, text, tag = turn
-        audio_url, dur = prepared if prepared is not None else await self._synthesize_turn(turn)
+        _, text, tag = turn
+        speaker = "expert"
+        audio_url, dur = prepared if prepared is not None else await self._synthesize_turn((speaker, text, tag))
+        if self.paused:
+            return (False, None)
 
         if slide_url:
             await self._switch_slide_if_needed(slide_url)
@@ -181,30 +224,31 @@ class CommentaryPipeline:
             self._recent_transcript.pop(0)
         _log_line(f"SPEAK:{speaker.upper()}:{tag}", text)
 
-        await self._broadcast_json(
-            {
-                "type": "commentary",
-                "speaker": speaker,
-                "text": text,
-                "tag": tag,
-                "audio_url": audio_url,
-                "slide_url": slide_url or "",
-            }
-        )
+        payload: dict[str, object] = {
+            "type": "commentary",
+            "speaker": speaker,
+            "text": text,
+            "tag": tag,
+            "audio_url": audio_url,
+            "slide_url": slide_url or "",
+        }
+        if sync_state is not None:
+            payload["state"] = sync_state.model_dump()
+        await self._broadcast_json(payload)
+        if sync_state is not None:
+            self._ball_audio_synced.set()
 
         next_task: asyncio.Task | None = None
         if lookahead_turn is not None:
             next_task = asyncio.create_task(self._synthesize_turn(lookahead_turn))
 
-        wait_sec = max(0.35, dur - 0.12)
+        wait_sec = max(0.25, dur - 0.25)
         if not interruptible:
             await asyncio.sleep(wait_sec)
             return (True, next_task)
 
         try:
             await asyncio.wait_for(self._interrupt_event.wait(), timeout=wait_sec)
-            if next_task and not next_task.done():
-                next_task.cancel()
             return (False, None)
         except asyncio.TimeoutError:
             return (True, next_task)
@@ -212,17 +256,11 @@ class CommentaryPipeline:
     async def prewarm_assets(self, max_items: int = 8) -> int:
         """Pre-synthesize static rules and DB stories into disk TTS cache."""
         warmed = 0
-        for st in get_all_stories()[:max_items]:
-            if warmed >= max_items:
-                break
-            await synthesize_fish_audio(st["host_line"], speaker="host")
-            await synthesize_fish_audio(st["expert_line"], speaker="expert")
-            warmed += 2
         for _, turns in RULES_AND_CRAFT_LIBRARY[:3]:
             if warmed >= max_items * 2:
                 break
-            for spk, txt in turns:
-                await synthesize_fish_audio(txt, speaker=spk)
+            for _, txt in turns:
+                await synthesize_fish_audio(txt, speaker="expert")
                 warmed += 1
         _log_line("PREWARM", f"Pre-generated {warmed} cached commentary clips")
         return warmed
@@ -257,35 +295,69 @@ class CommentaryPipeline:
                     await asyncio.sleep(1.0)
                     continue
 
-                # 1. Immediate preemption for live ball events
-                if self._priority_events:
+                # 1. Priority milestone or live ball events
+                if self._priority_turns or self._priority_events:
                     self._interrupt_event.clear()
+                    is_hard_interrupt = self._major_interrupt_pending
+                    self._major_interrupt_pending = False
                     prepared_next = None
                     self._active_turns.clear()
                     next_slide_for_queue = None
+                    if ai_seg_task and not ai_seg_task.done():
+                        ai_seg_task.cancel()
+                    ai_seg_task = None
 
-                    prev, curr = self._priority_events.pop(0)
-                    while self._priority_events:
-                        _, curr = self._priority_events.pop(0)
+                    if is_hard_interrupt:
+                        await self._broadcast_json({"type": "commentary_interrupt"})
 
-                    turns, new_ball_id = build_live_ball_turns(
-                        prev, curr, self.deck, self._last_spoken_ball_id
-                    )
-                    if new_ball_id:
-                        self._last_spoken_ball_id = new_ball_id
+                    if self._priority_turns:
+                        turns = [self._priority_turns.pop(0)]
+                        curr_sync = None
+                    else:
+                        prev, curr = self._priority_events.pop(0)
+                        while self._priority_events:
+                            _, curr = self._priority_events.pop(0)
+
+                        turns, new_ball_id = await build_live_ball_turns_async(
+                            prev,
+                            curr,
+                            self.deck,
+                            self._last_spoken_ball_id,
+                            [r["text"] for r in self._recent_transcript[-6:]],
+                        )
+                        if self._priority_events:
+                            while self._priority_events:
+                                _, curr = self._priority_events.pop(0)
+                            turns, new_ball_id = await build_live_ball_turns_async(
+                                prev,
+                                curr,
+                                self.deck,
+                                self._last_spoken_ball_id,
+                                [r["text"] for r in self._recent_transcript[-6:]],
+                            )
+                        if new_ball_id:
+                            self._last_spoken_ball_id = new_ball_id
+                        curr_sync = curr
+
+                    if self.paused:
+                        continue
 
                     if turns:
-                        await self._broadcast_json({"type": "commentary_interrupt"})
                         # Stay locked on Scoreboard (/) during live play and over breaks
                         await self._switch_slide_if_needed("/")
                         for idx, t in enumerate(turns):
                             look = turns[idx + 1] if idx + 1 < len(turns) else None
-                            _, nt = await self._deliver_turn(
+                            is_major_call = t[2] in ("live_wicket", "live_six", "live_four")
+                            completed, nt = await self._deliver_turn(
                                 t,
                                 prepared=prepared_next,
                                 lookahead_turn=look,
-                                interruptible=False,
+                                interruptible=not is_major_call,
+                                sync_state=curr_sync if idx == 0 else None,
                             )
+                            if not completed:
+                                prepared_next = None
+                                break
                             prepared_next = await nt if nt is not None else None
                     prepared_next = None
                     continue
@@ -355,7 +427,6 @@ class CommentaryPipeline:
                         prepared_next = None
                         continue
                     prepared_next = await next_task if next_task is not None else None
-                    await asyncio.sleep(0.18)
 
             except asyncio.CancelledError:
                 raise

@@ -481,13 +481,17 @@ function connectWebSocket() {
     try {
       const payload = JSON.parse(ev.data);
       if (payload.type === "event_fx" && payload.event && window.triggerEventFx) {
-        window.triggerEventFx(payload.event, payload.subtitle || "");
-        if (["FOUR", "SIX", "WICKET"].includes(String(payload.event || "").toUpperCase())) playStandaloneRoar();
+        if (isTopLevelWindow) {
+          window.triggerEventFx(payload.event, payload.subtitle || "");
+          if (["FOUR", "SIX", "WICKET"].includes(String(payload.event || "").toUpperCase())) playStandaloneRoar();
+        }
         return;
       }
       if (payload.type === "milestone" && window.triggerMilestoneFx) {
-        window.triggerMilestoneFx(payload);
-        playStandaloneRoar();
+        if (isTopLevelWindow) {
+          window.triggerMilestoneFx(payload);
+          playStandaloneRoar();
+        }
         return;
       }
       if (payload.type === "commentary_interrupt") {
@@ -523,6 +527,10 @@ eventButtons.forEach((btn) => {
     eventButtons.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     setCallout(btn.dataset.event, btn.dataset.tone);
+    if (["four", "six", "wicket"].includes(btn.dataset.tone) && window.triggerEventFx) {
+      window.triggerEventFx(btn.dataset.event, "");
+      playStandaloneRoar();
+    }
   });
 });
 

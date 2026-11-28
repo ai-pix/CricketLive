@@ -63,6 +63,8 @@
       <button class="btn btn-green" onclick="post('/api/commentary/start')">🔊 Resume Mic</button>
       <button class="btn btn-red" onclick="post('/api/commentary/stop')">🔇 Mute / Stop Mic</button>
       <button class="btn" onclick="post('/api/control', {action:'crowd_toggle'})">🏟 Crowd BG On/Off</button>
+      <button class="btn" onclick="post('/api/news/refresh')">📰 Refresh Internet News</button>
+      <a class="btn" href="/news-portal/" target="_blank" style="text-decoration:none">🌐 Open News Portal</a>
       <button class="btn" onclick="sendSlide('/')">🏏 Scoreboard</button>
     </div>
   </div>

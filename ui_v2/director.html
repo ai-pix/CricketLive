@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Broadcast Director — Full Match Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;1,800&family=Inter:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="fx.css?v=2" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body.embed-mode { padding: 0; gap: 0; overflow: hidden; }
+    body.embed-mode .controls {
+      display: flex;
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      bottom: 14px;
+      z-index: 900;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(6, 10, 20, 0.92);
+      border: 1px solid rgba(255, 212, 38, 0.35);
+      backdrop-filter: blur(12px);
+      opacity: 0;
+      transform: translateY(18px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    body.embed-mode.show-dock .controls {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .director-stage:fullscreen .controls-float-hint,
+    body.embed-mode .controls-float-hint {
+      display: flex;
+    }
+    .controls-float-hint {
+      display: none;
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 950;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      color: rgba(255, 212, 38, 0.75);
+      border: 1px solid rgba(255, 212, 38, 0.28);
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 0.15;
+      transition: opacity 0.2s ease;
+    }
+    .controls-float-hint:hover,
+    body.show-dock .controls-float-hint {
+      opacity: 1;
+    }
+    .director-stage:fullscreen .controls {
+      display: flex;
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      bottom: 14px;
+      z-index: 900;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(6, 10, 20, 0.92);
+      border: 1px solid rgba(255, 212, 38, 0.35);
+      backdrop-filter: blur(12px);
+      opacity: 0;
+      transform: translateY(18px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    body.show-dock .director-stage:fullscreen .controls {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    body.embed-mode .director-stage {
+      border: none;
+      border-radius: 0;
+      max-width: 100vw;
+      width: 100vw;
+      height: 100vh;
+      aspect-ratio: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    body.embed-mode .director-frame {
+      width: min(100vw, calc(100vh * 16 / 9));
+      height: min(100vh, calc(100vw * 9 / 16));
+    }
+    body {
+      min-height: 100vh;
+      background: #04060b;
+      color: #fff;
+      font-family: "Inter", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      gap: 12px;
+    }
+    .director-stage {
+      position: relative;
+      width: 100%;
+      max-width: 1280px;
+      aspect-ratio: 16 / 9;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1.5px solid rgba(255, 212, 38, 0.35);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.85);
+      background: #05070e;
+    }
+    .director-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .btn {
+      background: #111827;
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-family: "Inter", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-gold { background: #ffd426; color: #0f172a; border-color: #ffd426; }
+    .btn.active { background: #22c55e; color: #052e16; border-color: #22c55e; }
+    .director-stage:fullscreen,
+    .director-stage:-webkit-full-screen {
+      width: 100vw;
+      height: 100vh;
+      max-width: 100vw;
+      aspect-ratio: auto;
+      border: none;
+      border-radius: 0;
+      background: #04060b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .director-stage:fullscreen .director-frame,
+    .director-stage:-webkit-full-screen .director-frame {
+      width: min(100vw, calc(100vh * 16 / 9));
+      height: min(100vh, calc(100vw * 9 / 16));
+    }
+  </style>
+</head>
+<body>
+  <div class="director-stage">
+    <iframe id="slideFrame" class="director-frame" src="/?v=56&embed=1"></iframe>
+    <div id="wipeCurtain" class="wipe-curtain"></div>
+    <button class="controls-float-hint" id="dockToggleBtn" title="Toggle Controls (Press C)">⚙</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-gold" id="startDemoBtn">▶ Start Live Broadcast</button>
+    <button class="btn active" id="audioToggleBtn">Commentary Audio: ON</button>
+    <button class="btn active" id="crowdToggleBtn">Crowd Noise: ON</button>
+    <button class="btn" id="fullscreenBtn" style="border-color:#a855f7;color:#e9d5ff">⛶ Full Screen</button>
+    <a class="btn" href="/voices.html" style="text-decoration:none;border-color:#38bdf8;color:#38bdf8">10 Girl Voices</a>
+    <button class="btn" onclick="window.triggerEventFx('FOUR', 'COVER DRIVE')">Test FOUR!</button>
+    <button class="btn" onclick="window.triggerEventFx('SIX', '94m MAXIMUM')">Test SIX!</button>
+    <button class="btn" onclick="window.triggerEventFx('WICKET', 'CLEAN BOWLED')">Test WICKET!</button>
+    <button class="btn" onclick="switchSlide('/')">Scoreboard (v2)</button>
+    <button class="btn" onclick="switchSlide('/player.html')">Player Card</button>
+    <button class="btn" onclick="switchSlide('/batting.html')">Batting</button>
+    <button class="btn" onclick="switchSlide('/bowling.html')">Bowling</button>
+    <button class="btn" onclick="switchSlide('/overs.html')">Overs</button>
+    <button class="btn" onclick="switchSlide('/leaders.html')">Leaders</button>
+    <button class="btn" onclick="switchSlide('/projected.html')">Projected</button>
+    <button class="btn" onclick="switchSlide('/pitch.html')">Pitch</button>
+    <button class="btn" onclick="switchSlide('/points.html')">WTC / Points</button>
+    <button class="btn" onclick="switchSlide('/form.html')">Form</button>
+    <button class="btn" onclick="switchSlide('/rankings.html')">Rankings</button>
+    <button class="btn" onclick="switchSlide('/report.html')">Match Report</button>
+    <button class="btn" onclick="switchSlide('/story.html')">Match Talks</button>
+    <button class="btn" onclick="switchSlide('/audience.html')">Audience Zone</button>
+    <button class="btn" onclick="switchSlide('/versus.html')">Versus</button>
+    <button class="btn" onclick="switchSlide('/prematch.html')" style="border-color:#f59e0b;color:#fcd34d">Pre-Match</button>
+    <button class="btn" onclick="switchSlide('/toss.html')" style="border-color:#f59e0b;color:#fcd34d">Toss Center</button>
+    <button class="btn" onclick="switchSlide('/key_battles.html')" style="border-color:#f59e0b;color:#fcd34d">Key Battles</button>
+    <button class="btn" onclick="switchSlide('/road_to_semi.html')" style="border-color:#f59e0b;color:#fcd34d">Series Tracker</button>
+    <button class="btn" onclick="switchSlide('/players_to_watch.html')" style="border-color:#f59e0b;color:#fcd34d">Players Watch</button>
+    <button class="btn" onclick="switchSlide('/predictions.html')" style="border-color:#f59e0b;color:#fcd34d">Predictions</button>
+    <button class="btn" onclick="switchSlide('/comparison.html')" style="border-color:#f59e0b;color:#fcd34d">Team Radar</button>
+    <button class="btn" onclick="switchSlide('/playing11.html')">Squads / XI</button>
+    <button class="btn" onclick="switchSlide('/news.html')" style="border-color:#38bdf8;color:#7dd3fc">Live News</button>
+    <button class="btn" onclick="switchSlide('/other_matches.html')" style="border-color:#38bdf8;color:#7dd3fc">Tour Results</button>
+    <button class="btn" onclick="switchSlide('/stories_hub.html')" style="border-color:#38bdf8;color:#7dd3fc">Small Stories</button>
+    <button class="btn" onclick="switchSlide('/experience.html')" style="border-color:#38bdf8;color:#7dd3fc">Experience</button>
+    <button class="btn" onclick="switchSlide('/stats_deep.html')" style="border-color:#38bdf8;color:#7dd3fc">Deep Stats</button>
+    <button class="btn" onclick="switchSlide('/break.html')">Break</button>
+  </div>
+
+  <script src="fx.js?v=3"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    if (params.get("embed") === "1" || params.get("obs") === "1" || Boolean(window.obsstudio)) {
+      document.body.classList.add("embed-mode");
+    }
+    const slideFrame = document.getElementById("slideFrame");
+    const wipeCurtain = document.getElementById("wipeCurtain");
+    const startDemoBtn = document.getElementById("startDemoBtn");
+    const audioToggleBtn = document.getElementById("audioToggleBtn");
+    const crowdToggleBtn = document.getElementById("crowdToggleBtn");
+
+    let audioEnabled = true;
+    let crowdEnabled = true;
+    const audioQueue = [];
+    let playing = false;
+
+    const crowdBg = new Audio("/assets/crowd_bg.mp3");
+    crowdBg.loop = true;
+    crowdBg.volume = 0.50;
+
+    function setCrowdDuck(ducked) {
+      crowdBg.volume = ducked ? 0.30 : 0.50;
+    }
+
+    function ensureCrowdPlaying() {
+      if (!crowdEnabled) {
+        crowdBg.pause();
+        return;
+      }
+      if (crowdBg.paused) {
+        crowdBg.play().catch(() => {});
+      }
+    }
+
+    function playCrowdRoar() {
+      if (!crowdEnabled) return;
+      try {
+        const roar = new Audio("/assets/crowd_roar.mp3");
+        roar.volume = 0.65;
+        roar.play().catch(() => {});
+      } catch {}
+    }
+
+    let currentSlideUrl = "/?v=59&embed=1";
+
+    function playNext() {
+      if (playing || audioQueue.length === 0) {
+        if (!playing && audioQueue.length === 0) setCrowdDuck(false);
+        return;
+      }
+      const item = audioQueue.shift();
+      playing = true;
+      setCrowdDuck(true);
+      if (item.slideUrl) {
+        switchSlide(item.slideUrl);
+      }
+      const a = new Audio(item.url);
+      window._activeAudioEl = a;
+      const done = () => {
+        if (window._activeAudioEl === a) window._activeAudioEl = null;
+        setTimeout(() => { playing = false; playNext(); }, item.pauseMs);
+      };
+      a.addEventListener("ended", done);
+      a.addEventListener("error", done);
+      a.play().catch(done);
+    }
+
+    function switchSlide(url) {
+      const clean = url === "/" ? "/?v=59" : url;
+      const targetUrl = clean.includes("embed=") ? clean : (clean + (clean.includes("?") ? "&" : "?") + "embed=1");
+      if (targetUrl === currentSlideUrl) return;
+      currentSlideUrl = targetUrl;
+      wipeCurtain.classList.remove("sweeping");
+      void wipeCurtain.offsetWidth;
+      wipeCurtain.classList.add("sweeping");
+      setTimeout(() => {
+        slideFrame.src = targetUrl;
+      }, 360);
+    }
+    window.switchSlide = switchSlide;
+
+    function connectDirectorWs() {
+      const wsProto = location.protocol === "https:" ? "wss:" : "ws:";
+      const ws = new WebSocket(`${wsProto}//${location.host}/ws`);
+      ws.addEventListener("message", (ev) => {
+        try {
+          const msg = JSON.parse(ev.data);
+          if (msg.type === "reload") {
+            location.reload();
+            return;
+          }
+          if (msg.type === "slide" && msg.url) {
+            if (msg.priority || (!playing && audioQueue.length === 0)) {
+              switchSlide(msg.url);
+            }
+          }
+          if (msg.type === "crowd_toggle") {
+            crowdToggleBtn.click();
+            return;
+          }
+          if (msg.type === "fx" && msg.event && window.triggerEventFx) {
+            window.triggerEventFx(msg.event, msg.detail || "");
+            if (["FOUR", "SIX", "WICKET"].includes(String(msg.event).toUpperCase())) playCrowdRoar();
+          } else if (msg.type === "event_fx" && msg.event) {
+            window.triggerEventFx(msg.event, msg.subtitle || "");
+            if (["FOUR", "SIX", "WICKET"].includes(String(msg.event).toUpperCase())) playCrowdRoar();
+          } else if (msg.type === "milestone") {
+            window.triggerMilestoneFx(msg);
+            playCrowdRoar();
+          } else if (msg.type === "commentary_interrupt") {
+            audioQueue.length = 0;
+            if (window._activeAudioEl) {
+              try { window._activeAudioEl.pause(); } catch {}
+              window._activeAudioEl = null;
+            }
+            playing = false;
+          } else if (msg.type === "commentary") {
+            console.log(`[${msg.speaker}]`, msg.text);
+            if (audioEnabled && msg.audio_url) {
+              audioQueue.push({ url: msg.audio_url, slideUrl: msg.slide_url || "", pauseMs: msg.speaker === "host" ? 180 : 320 });
+              playNext();
+            } else if (msg.slide_url) {
+              switchSlide(msg.slide_url);
+            }
+          }
+        } catch {}
+      });
+      ws.addEventListener("close", () => setTimeout(connectDirectorWs, 3000));
+    }
+
+    audioToggleBtn.addEventListener("click", () => {
+      audioEnabled = !audioEnabled;
+      audioToggleBtn.classList.toggle("active", audioEnabled);
+      audioToggleBtn.textContent = audioEnabled ? "Commentary Audio: ON" : "Commentary Audio: OFF";
+      if (audioEnabled) ensureCrowdPlaying();
+    });
+
+    crowdToggleBtn.addEventListener("click", () => {
+      crowdEnabled = !crowdEnabled;
+      crowdToggleBtn.classList.toggle("active", crowdEnabled);
+      crowdToggleBtn.textContent = crowdEnabled ? "Crowd Noise: ON" : "Crowd Noise: OFF";
+      ensureCrowdPlaying();
+    });
+
+    // Try starting stadium ambience automatically (works immediately in OBS; falls back to first click in browsers)
+    ensureCrowdPlaying();
+    window.addEventListener("pointerdown", ensureCrowdPlaying, { once: true });
+
+    startDemoBtn.addEventListener("click", async () => {
+      if (!audioEnabled) audioToggleBtn.click();
+      startDemoBtn.textContent = "● Live Broadcast: ON";
+      startDemoBtn.classList.add("active");
+      try {
+        const resp = await fetch("/api/broadcast/start", { method: "POST" });
+        const data = await resp.json();
+        if (data && data.slide) switchSlide(data.slide);
+      } catch {}
+    });
+
+    const stageEl = document.querySelector(".director-stage");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        (stageEl.requestFullscreen || stageEl.webkitRequestFullscreen).call(stageEl);
+      } else {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      }
+    }
+    fullscreenBtn.addEventListener("click", toggleFullscreen);
+    document.addEventListener("fullscreenchange", () => {
+      const isFs = Boolean(document.fullscreenElement);
+      fullscreenBtn.classList.toggle("active", isFs);
+      fullscreenBtn.textContent = isFs ? "✕ Exit Full Screen" : "⛶ Full Screen";
+    });
+    document.addEventListener("keydown", (e) => {
+      if (["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName)) return;
+      if (e.key.toLowerCase() === "f") {
+        toggleFullscreen();
+      } else if (e.key.toLowerCase() === "c") {
+        document.body.classList.toggle("show-dock");
+      }
+    });
+    const dockToggleBtn = document.getElementById("dockToggleBtn");
+    if (dockToggleBtn) {
+      dockToggleBtn.addEventListener("click", () => document.body.classList.toggle("show-dock"));
+    }
+
+    connectDirectorWs();
+  </script>
+</body>
+</html>

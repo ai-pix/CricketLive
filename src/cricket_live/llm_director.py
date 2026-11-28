@@ -49,18 +49,18 @@ def expand_form_list(items: list[str] | None) -> list[str]:
     return [mapping.get(str(x).strip().upper(), str(x)) for x in (items or [])]
 
 
-_SYSTEM_PROMPT = """You are the head Hindi broadcast director writing real-time two-person cricket commentary for Host ("host") and Expert ("expert"), inspired by Star Sports Hindi and BBC Test Match Special.
+_SYSTEM_PROMPT = """You are the sole, lead Hindi cricket commentator ("expert") on a high-energy live broadcast (Star Sports Hindi / IPL style).
 
-PERSONAS:
-- "host": A grounded, energetic MALE Indian cricket broadcast anchor (Star Sports Hindi style). MUST use strictly masculine Hindi verbs/grammar for himself ("मैं देख रहा हूँ", "मैं कह रहा हूँ", "बताता हूँ", "मानता हूँ") — NEVER feminine verbs like "बताती हूँ", "कहती हूँ", "देख रही हूँ", "लगती है". Owns live match urgency, scoreboard accuracy, transitions, news bulletins, and viewer engagement with crisp studio presence.
-- "expert": A calm, sharp MALE cricket analyst using strictly masculine Hindi grammar ("मैं मानता हूँ", "देख रहा हूँ") who breaks down pitch physics, tactics, matchups, and dressing-room stories.
+PERSONA:
+- "expert": An electrifying, sharp, passionate MALE Indian cricket commentator and analyst using strictly masculine Hindi verbs/grammar ("मैं देख रहा हूँ", "मैं मानता हूँ", "बता रहा हूँ") — NEVER feminine verbs like "बताती हूँ", "कहती हूँ", "देख रही हूँ".
+- You carry the ENTIRE broadcast solo with seamless continuity, excitement, match urgency, tactical insight, pitch physics, and crisp storytelling.
 
 STRICT RULES:
-1. OUTPUT FORMAT: Return ONLY a valid JSON array of 2 to 4 objects: [{"speaker": "host"|"expert", "text": "..."}]. No markdown fences, no commentary outside JSON.
-2. NATURAL SPOKEN HINDI (DEVANAGARI ONLY): Write warm, natural, conversational broadcast Hindi in pure Devanagari (transliterate English cricket terms/names like इंडिया ए, श्रीलंका ए, हेटमायर, चमीरा, नूर अहमद, पावरप्ले, नेट रन रेट). ALWAYS speak full team names like "इंडिया ए" / "भारत ए" and "श्रीलंका ए" (NEVER say abbreviations like "आईएनडी-ए" or "एसएल-ए"), and ALWAYS say "जीत" or "हार" (or "विन"/"लॉस") instead of short forms like "W" or "L". Use casual conversational fillers and natural breath pauses ("अरे वाह...", "देखिए...", "वैसे...", commas, and "...") instead of stiff bookish prose. Avoid heavy formal words ("उल्लेखनीय", "संभावना") and never mix Arabic/Urdu characters or raw English abbreviations.
-3. ANTI-PING-PONG VARIATION: Vary turn lengths naturally. Include extended 2-3 sentence tactical/storyteller turns when explaining pitch physics, news, or dressing-room stories rather than stiff 1-line trading.
-4. ZERO HALLUCINATION: Use ONLY numbers, scores, wickets, overs, player stats, team names, and news facts explicitly present in the provided JSON context. NEVER invent backstory, injury details, run counts, or events not written in the JSON. Keep unrelated cricket news clearly distinct from the live match teams.
-5. NO REPETITION & NO CANNED HANDOFFS: Never reuse openings/phrasings from recent_spoken_lines. Never say "continue what you were saying". Stay mid-broadcast (do not greet listeners with "नमस्कार दोस्तों" mid-match)."""
+1. OUTPUT FORMAT: Return ONLY a valid JSON array of 1 to 3 objects: [{"speaker": "expert", "text": "..."}]. Every object MUST have "speaker": "expert". No markdown fences, no commentary outside JSON.
+2. NATURAL SPOKEN HINDI (DEVANAGARI ONLY): Write vivid, high-energy, conversational broadcast Hindi in pure Devanagari (transliterate English cricket terms/names like इंडिया ए, श्रीलंका ए, हेटमायर, चमीरा, नूर अहमद, पावरप्ले, नेट रन रेट). ALWAYS speak full team names like "इंडिया ए" / "भारत ए" and "श्रीलंका ए" (NEVER abbreviations like "आईएनडी-ए" or "एसएल-ए"), and ALWAYS say "जीत" or "हार" instead of "W" or "L". Use natural spoken rhythm ("अरे वाह!", "देखिए...", "कमाल!", commas, "...") instead of stiff bookish prose. Never mix Arabic/Urdu characters or raw English abbreviations.
+3. CONSISTENT SOLO FLOW: Keep sentences flowing smoothly from one thought to the next as one continuous commentator — no host/co-host handoffs, no "जैसा आपने कहा", no "continue what you were saying", and no mid-match greetings like "नमस्कार दोस्तों".
+4. CREX COMMENTARY REFINEMENT: Whenever live_feed_commentary (from CREX) is provided, refine and elevate those exact ball/ground insights into exciting, natural spoken Hindi broadcast commentary rather than reading raw text robotically.
+5. ZERO HALLUCINATION & NO REPETITION: Use ONLY numbers, scores, wickets, overs, player stats, team names, and news facts explicitly present in the provided JSON context. Never reuse openings/phrasings from recent_spoken_lines_avoid_repeating."""
 
 
 def is_llm_configured() -> bool:
@@ -209,18 +209,94 @@ async def generate_llm_segment(
                 for item in arr:
                     if not isinstance(item, dict):
                         continue
-                    spk = str(item.get("speaker", "")).strip().lower()
-                    if spk not in ("host", "expert"):
-                        spk = "host" if not turns or turns[-1][0] == "expert" else "expert"
                     txt = str(item.get("text", "")).strip()
                     if len(txt) < 12:
                         continue
                     if any("\u0600" <= ch <= "\u06ff" for ch in txt):
                         continue
-                    turns.append((spk, txt, f"ai:{topic_hint}"))
-                if len(turns) >= 2:
+                    turns.append(("expert", txt, f"ai:{topic_hint}"))
+                if len(turns) >= 1:
                     return turns
                 print(f"[llm_director] too_few_turns ({len(turns)}, try {attempt+1}): {content[:140]}")
         except Exception as exc:
             print(f"[llm_director] error (try {attempt+1}): {type(exc).__name__}: {exc}")
     return None
+
+
+async def generate_live_ball_llm_turns(
+    prev: ScoreboardState | None,
+    curr: ScoreboardState,
+    crex_text: str,
+    recent_lines: list[str],
+    tag: str = "live_crex_ball",
+    timeout_sec: float = 2.2,
+) -> list[DirectedTurn] | None:
+    """Pass live CREX ball commentary + match state through the LLM so the solo Expert refines and delivers it."""
+    api_key = os.getenv("LLM_API_KEY", "").strip()
+    base_url = os.getenv("LLM_BASE_URL", "").strip().rstrip("/")
+    model = os.getenv("LLM_MODEL", "nvidia/nemotron-3-ultra-550b-a55b:free").strip()
+    if not api_key or not base_url:
+        return None
+
+    bat_full = expand_team_name(curr.batting_team)
+    bowl_full = expand_team_name(curr.bowling_team)
+    runs_delta = (curr.runs - prev.runs) if prev else 0
+    wicket_fell = bool(prev and curr.wickets > prev.wickets)
+    ball_ctx = {
+        "score": f"{bat_full} {curr.runs}/{curr.wickets} ({curr.overs} ov) vs {bowl_full}",
+        "runs_on_ball": runs_delta,
+        "wicket_fell": wicket_fell,
+        "striker": f"{curr.striker.name} {curr.striker.runs}({curr.striker.balls})",
+        "non_striker": f"{curr.non_striker.name} {curr.non_striker.runs}({curr.non_striker.balls})",
+        "bowler": f"{curr.bowler.name} {curr.bowler.wickets}/{curr.bowler.runs_conceded} ({curr.bowler.overs})",
+        "crr": curr.crr,
+        "rrr": curr.rrr,
+        "target": curr.target,
+        "crex_live_commentary": (crex_text or curr.live_commentary or "")[:700],
+        "recent_spoken_lines_avoid_repeating": recent_lines[-4:],
+    }
+    user_prompt = (
+        "Refine the CREX live ball commentary below into 1 or 2 punchy, exciting, natural solo Expert Hindi commentary turns "
+        "(pure Devanagari, high broadcast energy, no repetition). Return ONLY JSON array [{\"speaker\":\"expert\",\"text\":\"...\"}].\n"
+        f"Ball Context JSON:\n{json.dumps(ball_ctx, ensure_ascii=False)}"
+    )
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt},
+        ],
+        "temperature": 0.72,
+        "max_tokens": 350,
+        "reasoning": {"effort": "none"},
+    }
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    try:
+        async with httpx.AsyncClient(timeout=timeout_sec) as client:
+            resp = await client.post(f"{base_url}/chat/completions", headers=headers, json=payload)
+            if resp.status_code != 200:
+                print(f"[llm_director:ball] HTTP {resp.status_code}: {resp.text[:160]}")
+                return None
+            data = resp.json()
+            choices = data.get("choices") or []
+            if not choices:
+                return None
+            content = (choices[0].get("message") or {}).get("content") or ""
+            arr = _extract_json_array(content)
+            if not arr:
+                return None
+            turns: list[DirectedTurn] = []
+            for item in arr:
+                if not isinstance(item, dict):
+                    continue
+                txt = str(item.get("text", "")).strip()
+                if len(txt) < 10 or any("\u0600" <= ch <= "\u06ff" for ch in txt):
+                    continue
+                turns.append(("expert", txt, tag))
+            return turns if turns else None
+    except Exception as exc:
+        print(f"[llm_director:ball] error: {type(exc).__name__}: {exc}")
+        return None

@@ -63,13 +63,30 @@ async def sync_crex_match_once(url: str, state: ScoreboardState) -> dict[str, An
                         xi_teams = _find_xi_team_tabs(info_lines)
                         if len(xi_teams) >= 2:
                             t2 = xi_teams[1]
-                            t2_loc = page.locator(
-                                f"xpath=//*[contains(text(),'Playing XI') or contains(text(),'Squad')]/following::*[normalize-space(text())='{t2}']"
-                            ).first
-                            if await t2_loc.count() > 0:
-                                await t2_loc.scroll_into_view_if_needed()
-                                await t2_loc.click(timeout=3000, force=True)
-                                await asyncio.sleep(1.0)
+                            clicked_t2 = await page.evaluate(
+                                """(targetCode) => {
+                                    const headings = Array.from(document.querySelectorAll('*')).filter(el =>
+                                        /Playing XI|Squad/i.test((el.textContent || '').trim()) && (el.textContent || '').trim().length < 32
+                                    );
+                                    for (const h of headings) {
+                                        const box = h.closest('div, section');
+                                        const scope = box ? (box.parentElement || box) : document.body;
+                                        const btns = Array.from(scope.querySelectorAll('button, div, span, li, a')).filter(el => {
+                                            const t = (el.innerText || '').trim().toUpperCase();
+                                            const r = el.getBoundingClientRect();
+                                            return t === targetCode.toUpperCase() && r.width > 0 && r.height > 0;
+                                        });
+                                        if (btns.length) {
+                                            btns[btns.length - 1].click();
+                                            return true;
+                                        }
+                                    }
+                                    return false;
+                                }""",
+                                t2,
+                            )
+                            if clicked_t2:
+                                await asyncio.sleep(1.4)
                                 info_lines_2 = await page.evaluate(
                                     """() => document.body.innerText.split(/\\n+/).map(s => s.trim()).filter(Boolean)"""
                                 )
@@ -139,7 +156,7 @@ async def sync_crex_match_once(url: str, state: ScoreboardState) -> dict[str, An
                                     )"""
                                 )
                                 first_bat, first_bowl = _parse_tables_raw(t1_tables)
-                                m_hd = re.search(r"(\d+-\d+)\s*\(?(\d+\.\d+)\)?", opp_header)
+                                m_hd = re.search(r"(\d+-\d+)\s+(?:\()?(\d+\.\d+)\)?", opp_header)
                                 state.first_innings = {
                                     "team": opp_code,
                                     "score": m_hd.group(1) if m_hd else "",
@@ -149,6 +166,8 @@ async def sync_crex_match_once(url: str, state: ScoreboardState) -> dict[str, An
                                 }
                                 if not state.bowling_xi and first_bat:
                                     state.bowling_xi = [b.name for b in first_bat[:11]]
+                            else:
+                                state.first_innings = {"team": "", "score": "", "overs": "", "batters": [], "bowlers": []}
                         except Exception as exc_inn1:
                             print(f"[crex_sync:inn1] {exc_inn1}")
                     if (not state.batting_xi or state.batting_xi == state.bowling_xi) and state.batters_list:
@@ -156,12 +175,59 @@ async def sync_crex_match_once(url: str, state: ScoreboardState) -> dict[str, An
             except Exception as exc:
                 print(f"[crex_sync:scorecard] {exc}")
 
-            # 4. POINTS TABLE TAB
+            # 4. SERIES STATS & POINTS TABLE (try match tab first, then matching series link)
             try:
+                series_href = await page.evaluate(
+                    """(seriesName) => {
+                        const links = Array.from(document.querySelectorAll("a[href*='/series/']"));
+                        const norm = (s) => (s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+                        const target = norm(seriesName);
+                        for (const a of links) {
+                            const txt = norm(a.innerText);
+                            if (target && txt && (txt.includes(target) || target.includes(txt))) return a.href;
+                        }
+                        const mainLink = links.find((a) => !a.closest("footer"));
+                        return mainLink ? mainLink.href : (links[0] ? links[0].href : "");
+                    }""",
+                    state.series_name,
+                )
                 pt_tab = page.locator("text=Points Table").first
+                ss_match_tab = page.locator("text=Series Stats").first
                 if await pt_tab.count() > 0:
                     await pt_tab.click(timeout=5000)
                     await asyncio.sleep(2.2)
+                    pt_tables = await page.evaluate(
+                        """() => Array.from(document.querySelectorAll("table")).map(t =>
+                            Array.from(t.querySelectorAll("tr")).map(r =>
+                                Array.from(r.querySelectorAll("th, td")).map(c => c.innerText.trim().replace(/\\s+/g, " "))
+                            )
+                        )"""
+                    )
+                    pt_lines = await page.evaluate(
+                        """() => document.body.innerText.split(/\\n+/).map(s => s.trim()).filter(Boolean)"""
+                    )
+                    _apply_points_and_leaders(pt_tables, pt_lines, state)
+                elif await ss_match_tab.count() > 0:
+                    await ss_match_tab.click(timeout=4000)
+                    await asyncio.sleep(2.0)
+                    pt_tables = await page.evaluate(
+                        """() => Array.from(document.querySelectorAll("table")).map(t =>
+                            Array.from(t.querySelectorAll("tr")).map(r =>
+                                Array.from(r.querySelectorAll("th, td")).map(c => c.innerText.trim().replace(/\\s+/g, " "))
+                            )
+                        )"""
+                    )
+                    pt_lines = await page.evaluate(
+                        """() => document.body.innerText.split(/\\n+/).map(s => s.trim()).filter(Boolean)"""
+                    )
+                    _apply_points_and_leaders(pt_tables, pt_lines, state)
+                if series_href and (not state.points_table or len(state.points_table) <= 6):
+                    await page.goto(series_href, wait_until="domcontentloaded", timeout=25000)
+                    await asyncio.sleep(2.0)
+                    ss_tab = page.locator("text=Series Stats").first
+                    if await ss_tab.count() > 0:
+                        await ss_tab.click(timeout=4000)
+                        await asyncio.sleep(2.0)
                     pt_tables = await page.evaluate(
                         """() => Array.from(document.querySelectorAll("table")).map(t =>
                             Array.from(t.querySelectorAll("tr")).map(r =>
@@ -237,6 +303,7 @@ async def sync_crex_match_once(url: str, state: ScoreboardState) -> dict[str, An
 
 
 def _apply_live_lines(lines: list[str], state: ScoreboardState) -> None:
+    prev_overs_str = state.overs
     joined = "\n".join(lines)
     # Title: e.g. "DC Vs DV, 6th T20, ILT20 2026 Live" or "IND-A Vs SL-A, 1st Semi Final One Day..."
     for ln in lines[:30]:
@@ -253,11 +320,11 @@ def _apply_live_lines(lines: list[str], state: ScoreboardState) -> None:
                     state.bowling_team = t2
                 break
 
-    # Active score block: e.g. "DV" then "43-26.3" or "68-410.4" or "119-10(17.5)"
+    # Active score block: e.g. "DV" then "43-26.3", "119-10(17.5)", or Test "246-585.01st Inn"
     score_found = False
     for i, ln in enumerate(lines[:35]):
-        m_compact = re.match(r"^(\d+)-(10|[0-9])(\d{1,2}\.[0-6])$", ln)
-        m_std = re.match(r"^(\d+)[/-](\d+)\s*\(?(\d+\.\d+)\)?$", ln)
+        m_compact = re.match(r"^(\d+)-(10|[0-9])(\d{1,3}\.[0-6])(?:\s*(?:1st|2nd)\s*Inn)?$", ln, re.I)
+        m_std = re.match(r"^(\d+)[/-](\d+)\s*\(?(\d+\.\d+)\)?(?:\s*(?:1st|2nd)\s*Inn)?$", ln, re.I)
         m_hit = m_compact or m_std
         if m_hit:
             score_found = True
@@ -272,6 +339,11 @@ def _apply_live_lines(lines: list[str], state: ScoreboardState) -> None:
                 elif bat_code and not re.match(r"^[PT]\d+$", bat_code) and bat_code not in ("LIVE", "1ST INN", "2ND INN"):
                     if not state.batting_team:
                         state.batting_team = bat_code
+            break
+    for ln in lines[:30]:
+        m_opt = re.match(r"^([A-Za-z0-9\- ]+)\s+opt(?:ed)?\s+to\s+(bat|bowl)$", ln.strip(), re.I)
+        if m_opt:
+            state.toss = f"{m_opt.group(1).strip().upper()} WON THE TOSS AND CHOSE TO {m_opt.group(2).upper()}"
             break
 
     # Pre-match detection (when no live score exists yet, e.g. "Today" / "03:30 PM")
@@ -300,6 +372,10 @@ def _apply_live_lines(lines: list[str], state: ScoreboardState) -> None:
             state.toss = "TOSS COMING UP SOON"
             state.live_commentary = ""
 
+    # Reset chase-only fields unless the current CREX snapshot reports an active target / RRR
+    state.target = 0
+    state.rrr = 0.0
+
     # First innings target detection on summary/2nd-innings header: e.g. "(20.0)164-7"
     for ln in lines[:35]:
         m_inn1 = re.match(r"^\(\d+\.\d+\)\s*(\d+)(?:-\d+)?$", ln)
@@ -309,13 +385,27 @@ def _apply_live_lines(lines: list[str], state: ScoreboardState) -> None:
                 state.target = inn1_runs + 1
             break
 
-    m_crr = re.search(r"CRR\s*:\s*(\d+(?:\.\d+)?)", joined)
+    m_crr = re.search(r"CRR\s*:\s*(\d+(?:\.\d+)?)", joined, re.I)
     if m_crr:
         state.crr = float(m_crr.group(1))
-    m_rrr = re.search(r"RRR\s*:\s*(\d+(?:\.\d+)?)", joined)
+    elif state.overs and re.match(r"^\d+(?:\.\d+)?$", str(state.overs)):
+        ov_parts = str(state.overs).split(".")
+        ov_dec = int(ov_parts[0]) + (int(ov_parts[1]) / 6.0 if len(ov_parts) > 1 else 0.0)
+        if ov_dec > 0:
+            state.crr = round(state.runs / ov_dec, 2)
+
+    m_rrr = re.search(r"RRR\s*:\s*(\d+(?:\.\d+)?)", joined, re.I)
     if m_rrr:
         state.rrr = float(m_rrr.group(1))
-    m_need = re.search(r"need\s+(\d+)\s+runs\s+in\s+(\d+)\s+balls", joined, re.I)
+    m_need = re.search(r"(?:([A-Za-z0-9\-]+)\s+)?need\s+(\d+)\s+runs\s+in\s+(\d+)\s+balls", joined, re.I)
+    if m_need:
+        chasing_code = (m_need.group(1) or "").strip().upper()
+        if chasing_code and chasing_code == (state.bowling_team or "").strip().upper():
+            state.batting_team, state.bowling_team = state.bowling_team, state.batting_team
+        if not m_rrr:
+            balls_rem = int(m_need.group(3))
+            if balls_rem > 0:
+                state.rrr = round((int(m_need.group(2)) * 6.0) / balls_rem, 2)
 
     # Match result / innings break detection
     won_line = next(
@@ -339,17 +429,157 @@ def _apply_live_lines(lines: list[str], state: ScoreboardState) -> None:
     elif m_need:
         state.match_status = "live"
         state.match_result = ""
-        need = int(m_need.group(1))
+        need = int(m_need.group(2))
         state.target = state.runs + need
-        state.callout = f"NEED {need} IN {m_need.group(2)}B"
+        state.callout = f"NEED {need} IN {m_need.group(3)}B"
     elif score_found:
         state.match_status = "live"
         state.match_result = ""
 
     # P'ship & Last Wkt
-    m_pship = re.search(r"P'ship\s*:\s*([^\n]+)", joined)
+    m_pship = re.search(r"P'ship\s*:\s*([^\n]+)", joined, re.I) or re.search(
+        r"P'ship\s*:?\s*\n\s*(\d+\s*\(\d+\))", joined, re.I
+    )
     if m_pship:
-        state.partnership = m_pship.group(1).strip()
+        state.partnership = re.sub(r"\s+", "", m_pship.group(1).strip())
+
+    # Live crease batters (+ on-strike marker) & active bowler from top summary block
+    def _resolve_existing_player(raw_name: str, pool: list) -> object | None:
+        key = re.sub(r"[^A-Z0-9\s]", " ", raw_name.upper()).strip()
+        key = re.sub(r"\s+", " ", key)
+        if not key:
+            return None
+        parts = key.split(" ")
+        for item in pool:
+            iname = re.sub(r"\s+", " ", re.sub(r"[^A-Z0-9\s]", " ", item.name.upper()).strip())
+            if iname == key:
+                return item
+            iparts = iname.split(" ")
+            if len(parts) >= 2 and len(iparts) >= 2 and iparts[0][0] == parts[0][0] and iparts[-1] == parts[-1]:
+                return item
+        return None
+
+    idx_pship = next((idx_p for idx_p, ln in enumerate(lines) if re.match(r"^P'ship\s*:", ln, re.I)), -1)
+    if idx_pship > 6:
+        crease_block = lines[max(0, idx_pship - 16) : idx_pship]
+        parsed_bats = []
+        parsed_bowl = None
+        k = 0
+        while k < len(crease_block):
+            ln = crease_block[k].strip()
+            # Bowler: Name / "W-R" / "(O.B)"
+            if (
+                k + 2 < len(crease_block)
+                and re.match(r"^\d+-\d+$", crease_block[k + 1].strip())
+                and re.match(r"^\(\d+(?:\.\d+)?\)$", crease_block[k + 2].strip())
+                and not re.match(r"^(?:News|Live|Scorecard|Discussions|Points Table|Match info)$", ln, re.I)
+            ):
+                b_wkts, b_runs = [int(x) for x in crease_block[k + 1].strip().split("-")]
+                b_ov = crease_block[k + 2].strip().strip("()")
+                ov_parts = b_ov.split(".")
+                ov_dec = int(ov_parts[0]) + (int(ov_parts[1]) / 6.0 if len(ov_parts) > 1 else 0.0)
+                existing_bw = _resolve_existing_player(ln, state.bowlers_list + ([state.bowler] if state.bowler else []))
+                parsed_bowl = BowlerState(
+                    name=existing_bw.name if existing_bw else ln.upper(),
+                    wickets=b_wkts,
+                    runs_conceded=b_runs,
+                    overs=b_ov,
+                    maidens=existing_bw.maidens if existing_bw else 0,
+                    economy=round(b_runs / ov_dec, 2) if ov_dec > 0 else (existing_bw.economy if existing_bw else 0.0),
+                )
+                k += 3
+                continue
+            # Batter: Name / "R" / "(B)" [/ "+"]
+            if (
+                k + 2 < len(crease_block)
+                and re.match(r"^\d+$", crease_block[k + 1].strip())
+                and re.match(r"^\(\d+\)$", crease_block[k + 2].strip())
+                and not re.match(r"^(?:News|Live|Scorecard|Discussions|Points Table|Match info)$", ln, re.I)
+            ):
+                on_strike = False
+                step = 3
+                if k + 3 < len(crease_block) and crease_block[k + 3].strip() == "*":
+                    on_strike = True
+                    step = 4
+                elif k + 3 < len(crease_block) and crease_block[k + 3].strip() == "+":
+                    # CREX places '+' as a separator between the two batters (Batter 1 + Batter 2), not a strike marker
+                    step = 4
+                b_name_clean = ln.rstrip("*+ ").strip()
+                if ln.endswith("*"):
+                    on_strike = True
+                r_val = int(crease_block[k + 1].strip())
+                b_val = int(crease_block[k + 2].strip().strip("()"))
+                existing_bt = _resolve_existing_player(b_name_clean, state.batters_list + [state.striker, state.non_striker])
+                sr_val = round((r_val * 100.0) / b_val, 2) if b_val > 0 else 0.0
+                parsed_bats.append(
+                    BatsmanState(
+                        name=existing_bt.name if existing_bt else b_name_clean.upper(),
+                        runs=r_val,
+                        balls=b_val,
+                        fours=existing_bt.fours if existing_bt else 0,
+                        sixes=existing_bt.sixes if existing_bt else 0,
+                        strike_rate=sr_val,
+                        on_strike=on_strike,
+                        dismissal="Batting",
+                    )
+                )
+                k += step
+                continue
+            k += 1
+
+        prev_striker_name = (state.striker.name or "").upper()
+        prev_striker_balls = state.striker.balls
+        prev_striker_runs = state.striker.runs
+        prev_non_striker_name = (state.non_striker.name or "").upper()
+        prev_non_striker_balls = state.non_striker.balls
+        prev_non_striker_runs = state.non_striker.runs
+
+        if len(parsed_bats) >= 2:
+            b0, b1 = parsed_bats[0], parsed_bats[1]
+            if b1.on_strike and not b0.on_strike:
+                state.striker = b1.model_copy(update={"on_strike": True})
+                state.non_striker = b0.model_copy(update={"on_strike": False})
+            elif b0.on_strike and not b1.on_strike:
+                state.striker = b0.model_copy(update={"on_strike": True})
+                state.non_striker = b1.model_copy(update={"on_strike": False})
+            else:
+                # No explicit * / + marker in innerText: infer strike from ball/run delta & over end,
+                # or preserve previous striker rather than blindly resetting to parsed_bats[0].
+                prev_map = {
+                    prev_striker_name: (prev_striker_balls, prev_striker_runs),
+                    prev_non_striker_name: (prev_non_striker_balls, prev_non_striker_runs),
+                }
+                over_ended = bool(
+                    state.overs
+                    and state.overs != prev_overs_str
+                    and re.match(r"^\d+\.0$", state.overs.strip())
+                    and state.overs.strip() != "0.0"
+                )
+                inferred_striker_idx = None
+                for idx_b, cand in enumerate((b0, b1)):
+                    cname = cand.name.upper()
+                    if cname in prev_map:
+                        p_balls, p_runs = prev_map[cname]
+                        if cand.balls > p_balls:
+                            runs_delta = max(0, cand.runs - p_runs)
+                            stay_on_strike = (runs_delta % 2 == 0) and not over_ended
+                            inferred_striker_idx = idx_b if stay_on_strike else (1 - idx_b)
+                            break
+                if inferred_striker_idx is None and prev_striker_name:
+                    if b1.name.upper() == prev_striker_name:
+                        inferred_striker_idx = 0 if over_ended else 1
+                    elif b0.name.upper() == prev_striker_name:
+                        inferred_striker_idx = 1 if over_ended else 0
+                if inferred_striker_idx == 1:
+                    state.striker = b1.model_copy(update={"on_strike": True})
+                    state.non_striker = b0.model_copy(update={"on_strike": False})
+                else:
+                    state.striker = b0.model_copy(update={"on_strike": True})
+                    state.non_striker = b1.model_copy(update={"on_strike": False})
+        elif len(parsed_bats) == 1:
+            state.striker = parsed_bats[0].model_copy(update={"on_strike": True})
+        if parsed_bowl is not None:
+            state.bowler = parsed_bowl
     m_lw = re.search(r"Last Wkt\s*:\s*([^\n]+)", joined)
     if m_lw:
         state.last_wicket = m_lw.group(1).strip().upper()
@@ -362,6 +592,8 @@ def _apply_live_lines(lines: list[str], state: ScoreboardState) -> None:
             "team": lines[idx_potm + 2],
             "figures": lines[idx_potm + 3],
         }
+    else:
+        state.player_of_match = {"name": "", "team": "", "figures": ""}
 
     # Quiz Question
     idx_quiz = next((i for i, l in enumerate(lines) if "Play Quiz" in l), -1)
@@ -425,10 +657,16 @@ def _apply_live_lines(lines: list[str], state: ScoreboardState) -> None:
             state.prev_over = overs_found[-2]
 
     if state.match_status == "live" and not m_need and not won_line and not break_line:
+        stumps_line = next((ln for ln in lines[:25] if re.search(r"\bstumps\b", ln, re.I)), "")
+        day_line = next((ln for ln in lines[:25] if re.search(r"\bday\s+\d+", ln, re.I)), "")
         recent_balls = state.curr_over.balls or state.prev_over.balls
         last_b = str(recent_balls[-1]).strip() if recent_balls else ""
         lb_low = last_b.lower()
-        if lb_low == "4":
+        if stumps_line:
+            day_tag = re.search(r"day\s+\d+", day_line, re.I)
+            state.callout = f"STUMPS • {day_tag.group(0).upper()}" if day_tag else "STUMPS"
+            state.callout_tone = "neutral"
+        elif lb_low == "4":
             state.callout, state.callout_tone = "FOUR!", "four"
         elif lb_low == "6":
             state.callout, state.callout_tone = "SIX!", "six"
@@ -504,12 +742,31 @@ def _apply_match_info_lines(lines: list[str], state: ScoreboardState) -> None:
             else:
                 state.team_form = {"batting": seq[:5], "bowling": seq[5:10]}
 
-    # Head to Head
+    # Head to Head + recent H2H matches
     m_h2h_idx = next((i for i, l in enumerate(lines) if "Head to Head" in l), -1)
     if m_h2h_idx >= 0:
         nums = [l for l in lines[m_h2h_idx : m_h2h_idx + 10] if re.match(r"^\d+$", l)]
         if len(nums) >= 2:
-            state.head_to_head = f"{state.bowling_team} {nums[0]} - {nums[1]} {state.batting_team}"
+            h2h_hdr = lines[m_h2h_idx].upper()
+            b_pos = h2h_hdr.find(state.batting_team.upper())
+            w_pos = h2h_hdr.find(state.bowling_team.upper())
+            if w_pos != -1 and (b_pos == -1 or w_pos < b_pos):
+                state.head_to_head = f"{state.bowling_team} {nums[0]} - {nums[1]} {state.batting_team}"
+            else:
+                state.head_to_head = f"{state.batting_team} {nums[0]} - {nums[1]} {state.bowling_team}"
+        h2h_block = lines[m_h2h_idx : m_h2h_idx + 80]
+        parsed_h2h: list[dict[str, str]] = []
+        for idx_h, hln in enumerate(h2h_block):
+            if re.match(r"^(?:Match Drawn|[A-Za-z0-9\- ]+\s+Won.*)$", hln, re.I) and idx_h + 1 < len(h2h_block):
+                match_lbl = h2h_block[idx_h + 1]
+                if re.search(r"\b(?:Test|ODI|T20I|T20|Match|Final)\b", match_lbl, re.I):
+                    prev_tokens = [t for t in h2h_block[max(0, idx_h - 6) : idx_h] if t not in ("*", "-")]
+                    score_a = " ".join(prev_tokens[-4:]) if prev_tokens else ""
+                    next_tokens = [t for t in h2h_block[idx_h + 2 : min(len(h2h_block), idx_h + 8)] if not re.search(r"Won|Drawn|Team Comparison", t, re.I)]
+                    score_b = " ".join(next_tokens[:4]) if next_tokens else ""
+                    parsed_h2h.append({"match": match_lbl, "score_a": score_a, "score_b": score_b, "result": hln})
+        if parsed_h2h:
+            state.recent_h2h = parsed_h2h[:4]
 
     # Weather
     m_temp = re.search(r"(\d+(?:\.\d+)?)\s*˚?C", joined)
@@ -646,10 +903,15 @@ def _parse_playing_xi(lines: list[str]) -> list[str]:
         return []
     players: list[str] = []
     limit = 15 if is_squad else 11
-    for ln in lines[start : start + 65]:
+    for ln in lines[start : start + 75]:
         low = ln.strip().lower()
         if low in {"on bench", "hot picks", "tournaments", "teams"}:
             break
+        if low in {"(c)", "(wk)", "(c) (wk)"}:
+            tag = ln.strip().upper()
+            if players and tag not in players[-1]:
+                players[-1] = f"{players[-1]} {tag}"
+            continue
         if low in _XI_IGNORE or low.startswith("(") or "✈" in ln:
             continue
         if len(ln.strip()) >= 2:
@@ -722,13 +984,21 @@ def _apply_scorecard_tables(tables: list[list[list[str]]], state: ScoreboardStat
     if batters:
         state.batters_list = batters
         active = [b for b in batters if "batting" in b.dismissal.lower() or "not out" in b.dismissal.lower()]
-        if len(active) >= 1:
-            state.striker = active[0].model_copy(update={"on_strike": True})
         if len(active) >= 2:
-            state.non_striker = active[1].model_copy(update={"on_strike": False})
+            curr_striker_name = (state.striker.name or "").upper()
+            if curr_striker_name and active[1].name.upper() == curr_striker_name:
+                state.striker = active[1].model_copy(update={"on_strike": True})
+                state.non_striker = active[0].model_copy(update={"on_strike": False})
+            else:
+                state.striker = active[0].model_copy(update={"on_strike": True})
+                state.non_striker = active[1].model_copy(update={"on_strike": False})
+        elif len(active) == 1:
+            state.striker = active[0].model_copy(update={"on_strike": True})
     if bowlers:
         state.bowlers_list = bowlers
-        state.bowler = bowlers[-1].model_copy(deep=True)
+        curr_bw = (state.bowler.name or "").upper()
+        matched_bw = next((bw for bw in bowlers if curr_bw and bw.name.upper() == curr_bw), None)
+        state.bowler = (matched_bw or bowlers[-1]).model_copy(deep=True)
     if fows:
         state.fall_of_wickets = fows
 
@@ -758,17 +1028,38 @@ def _apply_points_and_leaders(
             if pt_rows:
                 state.points_table = pt_rows
             break
+        if "team" in hdr and ("pct %" in hdr or "pct" in hdr) and "pts" in hdr:
+            pt_rows = []
+            for row in tbl[1:]:
+                if len(row) >= 8:
+                    pt_rows.append(
+                        {
+                            "team": row[0].upper(),
+                            "p": _parse_int(row[2]),
+                            "w": _parse_int(row[3]),
+                            "l": _parse_int(row[4]),
+                            "nr": _parse_int(row[5]),
+                            "nrr": f"{row[7]}%",
+                            "pts": _parse_int(row[6]),
+                        }
+                    )
+            if pt_rows:
+                state.points_table = pt_rows
+            break
 
     leaders: list[dict[str, str | int]] = []
     for cat in ("Most Runs", "Most Wickets", "Most Sixes", "Best Strike Rate"):
         idx = next((i for i, l in enumerate(lines) if l == cat), -1)
         if idx >= 0 and idx + 3 < len(lines):
+            raw_val = lines[idx + 3]
+            unit = lines[idx + 4] if idx + 4 < len(lines) and lines[idx + 4] in ("Runs", "Wickets", "Sixes", "SR") else ""
+            val = f"{raw_val} {unit}".strip() if unit else (f"{raw_val} SR" if cat == "Best Strike Rate" and "SR" not in raw_val else raw_val)
             leaders.append(
                 {
                     "category": cat.upper(),
                     "player": lines[idx + 1].upper(),
                     "team": lines[idx + 2].upper(),
-                    "value": lines[idx + 3],
+                    "value": val,
                 }
             )
     if leaders:
@@ -796,12 +1087,16 @@ def _apply_rankings_lines(lines: list[str], state: ScoreboardState) -> None:
 
 
 async def run_crex_live_watcher(url: str, state: ScoreboardState, on_update) -> None:
-    """Keep a persistent CREX Live tab open for 2s ball-by-ball updates + periodic full sync."""
+    """Keep persistent CREX Live + Scorecard tabs open for 2s full-scorecard & ball-by-ball updates."""
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 1440, "height": 900})
+        scorecard_page = await browser.new_page(viewport={"width": 1440, "height": 900})
         try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=35000)
+            await asyncio.gather(
+                page.goto(url, wait_until="domcontentloaded", timeout=35000),
+                scorecard_page.goto(url, wait_until="domcontentloaded", timeout=35000),
+            )
             await asyncio.sleep(2.5)
             # Switch CREX commentary to Hindi if the language button is present
             try:
@@ -811,48 +1106,149 @@ async def run_crex_live_watcher(url: str, state: ScoreboardState, on_update) -> 
                     await asyncio.sleep(1.5)
             except Exception:
                 pass
+            # Open the Scorecard tab on the dedicated scorecard_page
+            try:
+                sc_tab = scorecard_page.locator("text=Scorecard").first
+                if await sc_tab.count() > 0:
+                    await sc_tab.click(timeout=5000)
+                    await asyncio.sleep(1.5)
+            except Exception:
+                pass
             needs_full = not state.first_innings.get("score") or not state.latest_news
             last_full_sync = 0.0 if needs_full else asyncio.get_running_loop().time()
 
             while True:
-                snap = await page.evaluate(
-                    """() => {
-                        const lines = document.body.innerText.split(/\\n+/).map(s => s.trim()).filter(Boolean);
-                        let comm = "";
-                        const cards = Array.from(document.querySelectorAll(".cm-b-roundcard"));
-                        for (const c of cards) {
-                            const t = (c.innerText || "").trim().replace(/\\s+/g, " ");
-                            if (/^\\d+\\.\\d+\\s+/.test(t) && t.length > 22) {
-                                comm = t;
-                                break;
+                snap, sc_tables = await asyncio.gather(
+                    page.evaluate(
+                        """() => {
+                            const lines = document.body.innerText.split(/\\n+/).map(s => s.trim()).filter(Boolean);
+                            let comm = "";
+                            const cards = Array.from(document.querySelectorAll(".cm-b-roundcard"));
+                            for (const c of cards.slice(0, 6)) {
+                                const t = (c.innerText || "").trim().replace(/\\s+/g, " ");
+                                if (/^\\d+\\.\\d+\\s+/.test(t) && /[\\u0900-\\u097F]/.test(t) && t.length > 22) {
+                                    comm = t;
+                                    break;
+                                }
                             }
-                        }
-                        if (!comm) {
-                            const c2 = document.querySelector(".cm-b-comment-c2");
-                            if (c2) comm = (c2.innerText || "").trim().replace(/\\s+/g, " ");
-                        }
-                        return { lines, comm };
-                    }"""
+                            if (!comm) {
+                                for (const c of cards.slice(0, 4)) {
+                                    const t = (c.innerText || "").trim().replace(/\\s+/g, " ");
+                                    if (/^\\d+\\.\\d+\\s+/.test(t) && t.length > 28) {
+                                        comm = t;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!comm) {
+                                const c2 = document.querySelector(".cm-b-comment-c2");
+                                if (c2) comm = (c2.innerText || "").trim().replace(/\\s+/g, " ");
+                            }
+                            return { lines, comm };
+                        }"""
+                    ),
+                    scorecard_page.evaluate(
+                        """() => Array.from(document.querySelectorAll("table")).map(t =>
+                            Array.from(t.querySelectorAll("tr")).map(r =>
+                                Array.from(r.querySelectorAll("th, td")).map(c => c.innerText.trim().replace(/\\s+/g, " "))
+                            )
+                        )"""
+                    ),
                 )
-                prev_sig = (state.runs, state.wickets, state.overs, state.live_commentary, state.match_status, state.batting_team, state.callout)
+                prev_sig = (
+                    state.runs,
+                    state.wickets,
+                    state.overs,
+                    state.partnership,
+                    state.crr,
+                    state.rrr,
+                    state.target,
+                    state.striker.name,
+                    state.striker.runs,
+                    state.striker.balls,
+                    state.non_striker.name,
+                    state.non_striker.runs,
+                    state.non_striker.balls,
+                    state.bowler.name,
+                    state.bowler.wickets,
+                    state.bowler.runs_conceded,
+                    state.bowler.overs,
+                    state.live_commentary,
+                    state.match_status,
+                    state.batting_team,
+                    state.callout,
+                    tuple((b.name, b.runs, b.balls, b.fours, b.sixes, b.dismissal) for b in state.batters_list),
+                    tuple((bw.name, bw.overs, bw.runs_conceded, bw.wickets) for bw in state.bowlers_list),
+                    len(state.fall_of_wickets),
+                )
                 _apply_live_lines(snap.get("lines") or [], state)
                 if snap.get("comm"):
                     state.live_commentary = snap["comm"]
-                curr_sig = (state.runs, state.wickets, state.overs, state.live_commentary, state.match_status, state.batting_team, state.callout)
+                if sc_tables:
+                    _apply_scorecard_tables(sc_tables, state)
+                curr_sig = (
+                    state.runs,
+                    state.wickets,
+                    state.overs,
+                    state.partnership,
+                    state.crr,
+                    state.rrr,
+                    state.target,
+                    state.striker.name,
+                    state.striker.runs,
+                    state.striker.balls,
+                    state.non_striker.name,
+                    state.non_striker.runs,
+                    state.non_striker.balls,
+                    state.bowler.name,
+                    state.bowler.wickets,
+                    state.bowler.runs_conceded,
+                    state.bowler.overs,
+                    state.live_commentary,
+                    state.match_status,
+                    state.batting_team,
+                    state.callout,
+                    tuple((b.name, b.runs, b.balls, b.fours, b.sixes, b.dismissal) for b in state.batters_list),
+                    tuple((bw.name, bw.overs, bw.runs_conceded, bw.wickets) for bw in state.bowlers_list),
+                    len(state.fall_of_wickets),
+                )
 
                 if curr_sig != prev_sig:
                     save_match_state(url, state.model_dump())
                     await on_update(state)
 
                 now = asyncio.get_running_loop().time()
-                if now - last_full_sync >= 45.0:
+                if last_full_sync == 0.0 and now > 0:
                     last_full_sync = now
                     try:
+                        pre_team = state.batting_team
+                        pre_runs = state.runs
+                        pre_wkts = state.wickets
+                        pre_overs = state.overs
+                        pre_comm = state.live_commentary
+
+                        def _ov_t(ov: str) -> tuple[int, int]:
+                            pts = str(ov or "0.0").split(".")
+                            try:
+                                return (int(pts[0] or 0), int(pts[1] or 0) if len(pts) > 1 else 0)
+                            except Exception:
+                                return (0, 0)
+
                         await sync_crex_match_once(url, state)
+                        if state.batting_team == pre_team and (
+                            _ov_t(state.overs) < _ov_t(pre_overs)
+                            or state.runs < pre_runs
+                            or state.wickets < pre_wkts
+                        ):
+                            state.runs = pre_runs
+                            state.wickets = pre_wkts
+                            state.overs = pre_overs
+                            if pre_comm:
+                                state.live_commentary = pre_comm
                         await on_update(state)
                     except Exception as exc:
                         print(f"[crex_watcher:full] {exc}")
 
-                await asyncio.sleep(2.0)
+                await asyncio.sleep(1.0)
         finally:
             await browser.close()

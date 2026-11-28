@@ -1,0 +1,148 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1280
+PlayResY: 720
+WrapStyle: 2
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Hinglish,Segoe UI,38,&H00FFFFFF,&H0000E5FF,&H00120E0A,&H96000000,-1,0,0,0,100,100,0.6,0,1,3.4,1.8,2,80,80,44,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:00.70,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}Namaste
+Dialogue: 0,0:00:00.70,0:00:01.20,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Namaste {\c&H0000E5FF&\fscx108\fscy108}dosto!
+Dialogue: 0,0:00:01.20,0:00:01.50,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Namaste dosto! {\c&H0000E5FF&\fscx108\fscy108}Aaj
+Dialogue: 0,0:00:01.50,0:00:01.71,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Namaste dosto! Aaj {\c&H0000E5FF&\fscx108\fscy108}ki
+Dialogue: 0,0:00:01.71,0:00:02.21,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}sabse
+Dialogue: 0,0:00:02.21,0:00:02.61,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}sabse {\c&H0000E5FF&\fscx108\fscy108}badi
+Dialogue: 0,0:00:02.61,0:00:03.21,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}sabse badi {\c&H0000E5FF&\fscx108\fscy108}khabar
+Dialogue: 0,0:00:03.21,0:00:03.71,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}sabse badi khabar {\c&H0000E5FF&\fscx108\fscy108}India
+Dialogue: 0,0:00:03.71,0:00:03.91,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}ke
+Dialogue: 0,0:00:03.91,0:00:04.41,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ke {\c&H0000E5FF&\fscx108\fscy108}young
+Dialogue: 0,0:00:04.41,0:00:05.02,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ke young {\c&H0000E5FF&\fscx108\fscy108}batter
+Dialogue: 0,0:00:05.02,0:00:05.72,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ke young batter {\c&H0000E5FF&\fscx108\fscy108}Vaibhav
+Dialogue: 0,0:00:05.72,0:00:06.92,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}Sooryavanshi
+Dialogue: 0,0:00:06.92,0:00:07.12,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Sooryavanshi {\c&H0000E5FF&\fscx108\fscy108}se
+Dialogue: 0,0:00:07.12,0:00:07.52,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Sooryavanshi se {\c&H0000E5FF&\fscx108\fscy108}judi
+Dialogue: 0,0:00:07.52,0:00:07.82,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Sooryavanshi se judi {\c&H0000E5FF&\fscx108\fscy108}hai,
+Dialogue: 0,0:00:07.82,0:00:08.33,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}jinki
+Dialogue: 0,0:00:08.33,0:00:09.03,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}jinki {\c&H0000E5FF&\fscx108\fscy108}toofani
+Dialogue: 0,0:00:09.03,0:00:09.73,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}jinki toofani {\c&H0000E5FF&\fscx108\fscy108}batting
+Dialogue: 0,0:00:09.73,0:00:09.93,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}jinki toofani batting {\c&H0000E5FF&\fscx108\fscy108}ne
+Dialogue: 0,0:00:09.93,0:00:10.43,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}poori
+Dialogue: 0,0:00:10.43,0:00:11.03,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}poori {\c&H0000E5FF&\fscx108\fscy108}duniya
+Dialogue: 0,0:00:11.03,0:00:11.24,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}poori duniya {\c&H0000E5FF&\fscx108\fscy108}ko
+Dialogue: 0,0:00:11.24,0:00:11.84,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}poori duniya ko {\c&H0000E5FF&\fscx108\fscy108}hairan
+Dialogue: 0,0:00:11.84,0:00:12.14,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}kar
+Dialogue: 0,0:00:12.14,0:00:12.54,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}kar {\c&H0000E5FF&\fscx108\fscy108}diya
+Dialogue: 0,0:00:12.54,0:00:12.84,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}kar diya {\c&H0000E5FF&\fscx108\fscy108}hai!
+Dialogue: 0,0:00:13.12,0:00:13.30,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}53
+Dialogue: 0,0:00:13.30,0:00:13.74,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}53 {\c&H0000E5FF&\fscx108\fscy108}balls
+Dialogue: 0,0:00:13.74,0:00:14.10,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}53 balls {\c&H0000E5FF&\fscx108\fscy108}mein
+Dialogue: 0,0:00:14.10,0:00:14.37,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}53 balls mein {\c&H0000E5FF&\fscx108\fscy108}204
+Dialogue: 0,0:00:14.37,0:00:14.72,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}runs
+Dialogue: 0,0:00:14.72,0:00:14.90,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}runs {\c&H0000E5FF&\fscx108\fscy108}ki
+Dialogue: 0,0:00:14.90,0:00:15.70,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}runs ki {\c&H0000E5FF&\fscx108\fscy108}visphotak
+Dialogue: 0,0:00:15.70,0:00:16.33,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}runs ki visphotak {\c&H0000E5FF&\fscx108\fscy108}innings
+Dialogue: 0,0:00:16.33,0:00:16.86,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}khelne
+Dialogue: 0,0:00:16.86,0:00:17.22,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}khelne {\c&H0000E5FF&\fscx108\fscy108}wale
+Dialogue: 0,0:00:17.22,0:00:17.84,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}khelne wale {\c&H0000E5FF&\fscx108\fscy108}Vaibhav
+Dialogue: 0,0:00:17.84,0:00:18.91,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}Sooryavanshi
+Dialogue: 0,0:00:18.91,0:00:19.09,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Sooryavanshi {\c&H0000E5FF&\fscx108\fscy108}ne
+Dialogue: 0,0:00:19.09,0:00:19.45,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Sooryavanshi ne {\c&H0000E5FF&\fscx108\fscy108}Asia
+Dialogue: 0,0:00:19.45,0:00:19.71,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Sooryavanshi ne Asia {\c&H0000E5FF&\fscx108\fscy108}Cup
+Dialogue: 0,0:00:19.71,0:00:20.07,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}mein
+Dialogue: 0,0:00:20.07,0:00:20.34,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}mein {\c&H0000E5FF&\fscx108\fscy108}bhi
+Dialogue: 0,0:00:20.34,0:00:21.05,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}mein bhi {\c&H0000E5FF&\fscx108\fscy108}shandaar
+Dialogue: 0,0:00:21.05,0:00:21.41,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}mein bhi shandaar {\c&H0000E5FF&\fscx108\fscy108}form
+Dialogue: 0,0:00:21.41,0:00:21.85,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}jaari
+Dialogue: 0,0:00:21.85,0:00:22.30,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}jaari {\c&H0000E5FF&\fscx108\fscy108}rakha
+Dialogue: 0,0:00:22.30,0:00:22.48,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}jaari rakha {\c&H0000E5FF&\fscx108\fscy108}—
+Dialogue: 0,0:00:22.48,0:00:22.92,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}jaari rakha — {\c&H0000E5FF&\fscx108\fscy108}jiski
+Dialogue: 0,0:00:22.92,0:00:23.10,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}ek
+Dialogue: 0,0:00:23.10,0:00:23.90,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ek {\c&H0000E5FF&\fscx108\fscy108}Pakistani
+Dialogue: 0,0:00:23.90,0:00:24.26,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ek Pakistani {\c&H0000E5FF&\fscx108\fscy108}star
+Dialogue: 0,0:00:24.26,0:00:25.06,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ek Pakistani star {\c&H0000E5FF&\fscx108\fscy108}cricketer
+Dialogue: 0,0:00:25.06,0:00:25.24,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}ne
+Dialogue: 0,0:00:25.24,0:00:25.51,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ne {\c&H0000E5FF&\fscx108\fscy108}bhi
+Dialogue: 0,0:00:25.51,0:00:26.04,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ne bhi {\c&H0000E5FF&\fscx108\fscy108}tareef
+Dialogue: 0,0:00:26.04,0:00:26.22,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ne bhi tareef {\c&H0000E5FF&\fscx108\fscy108}ki
+Dialogue: 0,0:00:26.22,0:00:26.49,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}hai!
+Dialogue: 0,0:00:26.77,0:00:27.21,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}Wahin
+Dialogue: 0,0:00:27.21,0:00:27.47,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Wahin {\c&H0000E5FF&\fscx108\fscy108}New
+Dialogue: 0,0:00:27.47,0:00:28.08,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Wahin New {\c&H0000E5FF&\fscx108\fscy108}Zealand
+Dialogue: 0,0:00:28.08,0:00:28.26,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Wahin New Zealand {\c&H0000E5FF&\fscx108\fscy108}ke
+Dialogue: 0,0:00:28.26,0:00:28.78,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}legend
+Dialogue: 0,0:00:28.78,0:00:29.22,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}legend {\c&H0000E5FF&\fscx108\fscy108}Chris
+Dialogue: 0,0:00:29.22,0:00:29.75,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}legend Chris {\c&H0000E5FF&\fscx108\fscy108}Cairns
+Dialogue: 0,0:00:29.75,0:00:29.92,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}legend Chris Cairns {\c&H0000E5FF&\fscx108\fscy108}ne
+Dialogue: 0,0:00:29.92,0:00:30.54,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}Vaibhav
+Dialogue: 0,0:00:30.54,0:00:30.71,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Vaibhav {\c&H0000E5FF&\fscx108\fscy108}ki
+Dialogue: 0,0:00:30.71,0:00:31.24,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Vaibhav ki {\c&H0000E5FF&\fscx108\fscy108}double
+Dialogue: 0,0:00:31.24,0:00:31.85,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Vaibhav ki double {\c&H0000E5FF&\fscx108\fscy108}century
+Dialogue: 0,0:00:31.85,0:00:32.11,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}par
+Dialogue: 0,0:00:32.11,0:00:32.46,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}par {\c&H0000E5FF&\fscx108\fscy108}kaha
+Dialogue: 0,0:00:32.46,0:00:32.64,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}par kaha {\c&H0000E5FF&\fscx108\fscy108}ki
+Dialogue: 0,0:00:32.64,0:00:32.99,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}par kaha ki {\c&H0000E5FF&\fscx108\fscy108}aisi
+Dialogue: 0,0:00:32.99,0:00:34.04,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}avishwasniya
+Dialogue: 0,0:00:34.04,0:00:34.65,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}avishwasniya {\c&H0000E5FF&\fscx108\fscy108}batting
+Dialogue: 0,0:00:34.65,0:00:35.27,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}avishwasniya batting {\c&H0000E5FF&\fscx108\fscy108}cricket
+Dialogue: 0,0:00:35.27,0:00:35.62,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}mein
+Dialogue: 0,0:00:35.62,0:00:36.32,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}mein {\c&H0000E5FF&\fscx108\fscy108}baar-baar
+Dialogue: 0,0:00:36.32,0:00:36.84,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}mein baar-baar {\c&H0000E5FF&\fscx108\fscy108}dekhne
+Dialogue: 0,0:00:36.84,0:00:37.02,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}mein baar-baar dekhne {\c&H0000E5FF&\fscx108\fscy108}ko
+Dialogue: 0,0:00:37.02,0:00:37.37,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}nahi
+Dialogue: 0,0:00:37.37,0:00:37.81,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}nahi {\c&H0000E5FF&\fscx108\fscy108}milti!
+Dialogue: 0,0:00:38.09,0:00:38.51,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}Chris
+Dialogue: 0,0:00:38.51,0:00:39.03,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Chris {\c&H0000E5FF&\fscx108\fscy108}Cairns
+Dialogue: 0,0:00:39.03,0:00:39.20,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Chris Cairns {\c&H0000E5FF&\fscx108\fscy108}ne
+Dialogue: 0,0:00:39.20,0:00:39.62,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Chris Cairns ne {\c&H0000E5FF&\fscx108\fscy108}maana
+Dialogue: 0,0:00:39.62,0:00:39.79,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}ki
+Dialogue: 0,0:00:39.79,0:00:40.13,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ki {\c&H0000E5FF&\fscx108\fscy108}itni
+Dialogue: 0,0:00:40.13,0:00:40.39,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ki itni {\c&H0000E5FF&\fscx108\fscy108}kam
+Dialogue: 0,0:00:40.39,0:00:40.73,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ki itni kam {\c&H0000E5FF&\fscx108\fscy108}umar
+Dialogue: 0,0:00:40.73,0:00:41.07,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}mein
+Dialogue: 0,0:00:41.07,0:00:41.67,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}mein {\c&H0000E5FF&\fscx108\fscy108}Vaibhav
+Dialogue: 0,0:00:41.67,0:00:41.84,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}mein Vaibhav {\c&H0000E5FF&\fscx108\fscy108}ka
+Dialogue: 0,0:00:41.84,0:00:42.18,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}mein Vaibhav ka {\c&H0000E5FF&\fscx108\fscy108}shot
+Dialogue: 0,0:00:42.18,0:00:42.95,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}selection
+Dialogue: 0,0:00:42.95,0:00:43.20,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}selection {\c&H0000E5FF&\fscx108\fscy108}aur
+Dialogue: 0,0:00:43.20,0:00:43.63,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}selection aur {\c&H0000E5FF&\fscx108\fscy108}power
+Dialogue: 0,0:00:43.63,0:00:44.22,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}selection aur power {\c&H0000E5FF&\fscx108\fscy108}hitting
+Dialogue: 0,0:00:44.22,0:00:45.08,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}world-class
+Dialogue: 0,0:00:45.08,0:00:45.33,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}world-class {\c&H0000E5FF&\fscx108\fscy108}hai,
+Dialogue: 0,0:00:45.33,0:00:45.59,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}world-class hai, {\c&H0000E5FF&\fscx108\fscy108}aur
+Dialogue: 0,0:00:45.59,0:00:45.84,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}world-class hai, aur {\c&H0000E5FF&\fscx108\fscy108}woh
+Dialogue: 0,0:00:45.84,0:00:46.18,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}aage
+Dialogue: 0,0:00:46.18,0:00:46.52,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}aage {\c&H0000E5FF&\fscx108\fscy108}bade
+Dialogue: 0,0:00:46.52,0:00:47.12,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}aage bade {\c&H0000E5FF&\fscx108\fscy108}records
+Dialogue: 0,0:00:47.12,0:00:47.38,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}aage bade records {\c&H0000E5FF&\fscx108\fscy108}tod
+Dialogue: 0,0:00:47.38,0:00:47.80,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}sakte
+Dialogue: 0,0:00:47.80,0:00:48.14,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}sakte {\c&H0000E5FF&\fscx108\fscy108}hain!
+Dialogue: 0,0:00:48.42,0:00:48.81,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}Waqai
+Dialogue: 0,0:00:48.81,0:00:49.28,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Waqai {\c&H0000E5FF&\fscx108\fscy108}Indian
+Dialogue: 0,0:00:49.28,0:00:49.82,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Waqai Indian {\c&H0000E5FF&\fscx108\fscy108}cricket
+Dialogue: 0,0:00:49.82,0:00:49.97,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}Waqai Indian cricket {\c&H0000E5FF&\fscx108\fscy108}ko
+Dialogue: 0,0:00:49.97,0:00:50.13,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}ek
+Dialogue: 0,0:00:50.13,0:00:50.44,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ek {\c&H0000E5FF&\fscx108\fscy108}naya
+Dialogue: 0,0:00:50.44,0:00:51.14,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ek naya {\c&H0000E5FF&\fscx108\fscy108}superstar
+Dialogue: 0,0:00:51.14,0:00:51.37,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}ek naya superstar {\c&H0000E5FF&\fscx108\fscy108}mil
+Dialogue: 0,0:00:51.37,0:00:51.76,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}chuka
+Dialogue: 0,0:00:51.76,0:00:51.99,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}chuka {\c&H0000E5FF&\fscx108\fscy108}hai!
+Dialogue: 0,0:00:51.99,0:00:52.53,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}chuka hai! {\c&H0000E5FF&\fscx108\fscy108}Vaibhav
+Dialogue: 0,0:00:52.53,0:00:52.69,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}chuka hai! Vaibhav {\c&H0000E5FF&\fscx108\fscy108}ki
+Dialogue: 0,0:00:52.69,0:00:52.84,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}is
+Dialogue: 0,0:00:52.84,0:00:53.38,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}is {\c&H0000E5FF&\fscx108\fscy108}innings
+Dialogue: 0,0:00:53.38,0:00:53.54,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}is innings {\c&H0000E5FF&\fscx108\fscy108}ko
+Dialogue: 0,0:00:53.54,0:00:53.77,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}is innings ko {\c&H0000E5FF&\fscx108\fscy108}aap
+Dialogue: 0,0:00:53.77,0:00:53.93,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}10
+Dialogue: 0,0:00:53.93,0:00:54.24,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}10 {\c&H0000E5FF&\fscx108\fscy108}mein
+Dialogue: 0,0:00:54.24,0:00:54.39,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}10 mein {\c&H0000E5FF&\fscx108\fscy108}se
+Dialogue: 0,0:00:54.39,0:00:54.78,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}10 mein se {\c&H0000E5FF&\fscx108\fscy108}kitne
+Dialogue: 0,0:00:54.78,0:00:55.24,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}number
+Dialogue: 0,0:00:55.24,0:00:55.63,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}number {\c&H0000E5FF&\fscx108\fscy108}denge?
+Dialogue: 0,0:00:55.63,0:00:56.17,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}number denge? {\c&H0000E5FF&\fscx108\fscy108}Comment
+Dialogue: 0,0:00:56.17,0:00:56.48,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}number denge? Comment {\c&H0000E5FF&\fscx108\fscy108}mein
+Dialogue: 0,0:00:56.48,0:00:56.95,Hinglish,,0,0,0,,{\blur0.6\c&H0000E5FF&\fscx108\fscy108}zaroor
+Dialogue: 0,0:00:56.95,0:00:57.57,Hinglish,,0,0,0,,{\blur0.6\c&H00FFFFFF&\fscx100\fscy100}zaroor {\c&H0000E5FF&\fscx108\fscy108}batayein!

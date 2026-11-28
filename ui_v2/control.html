@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OBS Control Dock — Cricket Live</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #070b14;
+      color: #f8fafc;
+      font-family: "Inter", sans-serif;
+      padding: 12px;
+      font-size: 12px;
+    }
+    .sec { margin-bottom: 12px; }
+    .lbl {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: #ffd426;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+    .btn {
+      background: #111827;
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-family: "Inter", sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn:hover { border-color: #ffd426; color: #fff; }
+    .btn-gold { background: #ffd426; color: #0f172a; border-color: #ffd426; }
+    .btn-green { background: #16a34a; color: #fff; border-color: #22c55e; }
+    .btn-red { background: #b91c1c; color: #fff; border-color: #ef4444; }
+    .status {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <div class="sec">
+    <div class="lbl">Broadcast &amp; Commentary</div>
+    <div class="grid">
+      <button class="btn btn-gold" onclick="post('/api/broadcast/start')">▶ Start Broadcast</button>
+      <button class="btn btn-green" onclick="post('/api/commentary/start')">🔊 Resume Mic</button>
+      <button class="btn btn-red" onclick="post('/api/commentary/stop')">🔇 Mute / Stop Mic</button>
+      <button class="btn" onclick="post('/api/control', {action:'crowd_toggle'})">🏟 Crowd BG On/Off</button>
+      <button class="btn" onclick="post('/api/news/refresh')">📰 Refresh Internet News</button>
+      <a class="btn" href="/news-portal/" target="_blank" style="text-decoration:none">🌐 Open News Portal</a>
+      <button class="btn" onclick="sendSlide('/')">🏏 Scoreboard (v2)</button>
+      <button class="btn" onclick="sendSlide('/v1/')">📺 Classic UI (v1)</button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="lbl">Pre-Match &amp; Toss Slides</div>
+    <div class="grid">
+      <button class="btn" onclick="sendSlide('/prematch.html')">Pre-Match</button>
+      <button class="btn" onclick="sendSlide('/toss.html')">Toss Center</button>
+      <button class="btn" onclick="sendSlide('/key_battles.html')">Key Battles</button>
+      <button class="btn" onclick="sendSlide('/road_to_semi.html')">Series Tracker</button>
+      <button class="btn" onclick="sendSlide('/players_to_watch.html')">Players Watch</button>
+      <button class="btn" onclick="sendSlide('/predictions.html')">Predictions</button>
+      <button class="btn" onclick="sendSlide('/playing11.html')">Playing XI</button>
+      <button class="btn" onclick="sendSlide('/pitch.html')">Pitch &amp; Venue</button>
+      <button class="btn" onclick="sendSlide('/comparison.html')">Team Radar</button>
+      <button class="btn" onclick="sendSlide('/versus.html')">Versus Poster</button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="lbl">Live Match Slides</div>
+    <div class="grid">
+      <button class="btn" onclick="sendSlide('/batting.html')">Batting Card</button>
+      <button class="btn" onclick="sendSlide('/bowling.html')">Bowling Card</button>
+      <button class="btn" onclick="sendSlide('/overs.html')">Overs &amp; FOW</button>
+      <button class="btn" onclick="sendSlide('/partnership.html')">Partnership</button>
+      <button class="btn" onclick="sendSlide('/player.html')">Player Card</button>
+      <button class="btn" onclick="sendSlide('/projected.html')">Projected</button>
+      <button class="btn" onclick="sendSlide('/points.html')">WTC / Points</button>
+      <button class="btn" onclick="sendSlide('/rankings.html')">ICC Rankings</button>
+      <button class="btn" onclick="sendSlide('/news.html')">Live News</button>
+      <button class="btn" onclick="sendSlide('/other_matches.html')">Tour Results</button>
+      <button class="btn" onclick="sendSlide('/break.html')">Studio Break</button>
+      <button class="btn" onclick="sendSlide('/report.html')">Match Report</button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="lbl">UI v2 Overlays &amp; Live FX</div>
+    <div class="grid">
+      <button class="btn btn-gold" onclick="post('/api/control', {action:'prematch'})">🎬 Pre-Match v2</button>
+      <button class="btn" onclick="post('/api/control', {action:'pitch'})">🏏 Pitch v2</button>
+      <button class="btn" onclick="post('/api/control', {action:'weather'})">🌤 Weather v2</button>
+      <button class="btn" onclick="post('/api/control', {action:'scorecard'})">📋 Scorecard v2</button>
+      <button class="btn btn-gold" onclick="post('/api/control', {action:'toss', winner:'IND', decision:'BOWL'})">🪙 Play Toss v2</button>
+      <button class="btn" onclick="post('/api/control', {action:'modal_close'})">✖ Hide Overlay v2</button>
+      <button class="btn" onclick="sendFx('FOUR', 'CRACKING BOUNDARY')">Trigger FOUR!</button>
+      <button class="btn" onclick="sendFx('SIX', 'MASSIVE MAXIMUM')">Trigger SIX!</button>
+      <button class="btn btn-red" onclick="sendFx('WICKET', 'BIG BREAKTHROUGH')">Trigger WICKET!</button>
+      <button class="btn" onclick="post('/api/toss', {winner:'IND',decision:'BOWL'})">Toss: IND Bowl</button>
+    </div>
+  </div>
+
+  <div class="status" id="statusBox">OBS Control Dock Ready</div>
+
+  <script>
+    const statusBox = document.getElementById("statusBox");
+    async function post(url, body = null) {
+      try {
+        const r = await fetch(url, {
+          method: "POST",
+          headers: body ? { "Content-Type": "application/json" } : {},
+          body: body ? JSON.stringify(body) : undefined,
+        });
+        statusBox.textContent = r.ok ? `Sent: ${url}` : `Error ${r.status}`;
+      } catch (e) {
+        statusBox.textContent = "Request failed";
+      }
+    }
+    function sendSlide(url) { post("/api/control", { action: "slide", url }); }
+    function sendFx(event, detail) { post("/api/control", { action: "fx", event, detail }); }
+  </script>
+</body>
+</html>

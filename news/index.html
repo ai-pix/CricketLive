@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Cricket Match News — Cricket Live</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #131c33 0%, #060912 72%);
+      color: #f8fafc;
+      font-family: "Inter", sans-serif;
+      padding: 24px 20px 48px;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    .hdr {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end;
+      gap: 14px; margin-bottom: 20px; padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .kicker { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; color: #ffd426; text-transform: uppercase; }
+    h1 { font-family: "Barlow Condensed", sans-serif; font-size: 42px; font-weight: 800; line-height: 1; margin-top: 4px; }
+    .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .btn {
+      background: #ffd426; color: #0f172a; border: none; border-radius: 8px;
+      padding: 10px 16px; font-size: 13px; font-weight: 800; cursor: pointer;
+    }
+    .btn-dark { background: #1e293b; color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.16); text-decoration: none; }
+    .meta { font-size: 12px; color: #94a3b8; margin-bottom: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+    .card {
+      background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+    .card:hover { border-color: rgba(255, 212, 38, 0.5); transform: translateY(-2px); }
+    .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .src {
+      font-size: 10px; font-weight: 800; letter-spacing: 0.1em; padding: 3px 8px; border-radius: 999px;
+      background: rgba(56, 189, 248, 0.16); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.35);
+      text-transform: uppercase;
+    }
+    .time { font-size: 11px; color: #64748b; }
+    .title { font-size: 16px; font-weight: 800; color: #fff; line-height: 1.35; text-decoration: none; }
+    .title:hover { color: #ffd426; }
+    .summary { font-size: 13px; color: #cbd5e1; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hdr">
+      <div>
+        <div class="kicker">MULTI-SOURCE INTERNET AGGREGATOR • LATEST MATCHES</div>
+        <h1>CRICKET LIVE NEWS DESK</h1>
+      </div>
+      <div class="actions">
+        <button class="btn" id="refreshBtn" onclick="refreshNews()">↻ Fetch Latest Internet News</button>
+        <a class="btn btn-dark" href="/news.html">Broadcast Slide</a>
+        <a class="btn btn-dark" href="/director.html">Director</a>
+      </div>
+    </div>
+    <div class="meta" id="metaLine">Loading latest match news...</div>
+    <div class="grid" id="newsGrid"></div>
+  </div>
+  <script>
+    const grid = document.getElementById("newsGrid");
+    const metaLine = document.getElementById("metaLine");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    function render(data) {
+      const items = (data && data.items) || (data && data.news) || [];
+      const sources = data && data.sources ? Object.entries(data.sources).map(([k, v]) => `${k} (${v})`).join(" • ") : "";
+      metaLine.textContent = `${items.length} stories loaded${sources ? " • Sources: " + sources : ""}${data && data.fetched_at ? " • Updated: " + data.fetched_at : ""}`;
+      grid.innerHTML = items.map((it) => `
+        <article class="card">
+          <div class="top">
+            <span class="src">${it.source || it.category || "NEWS"}</span>
+            <span class="time">${(it.published || it.fetched_at || "").slice(0, 22)}</span>
+          </div>
+          <a class="title" href="${it.source_url || "#"}" target="_blank" rel="noopener">${it.title}</a>
+          <div class="summary">${it.summary || ""}</div>
+        </article>
+      `).join("");
+    }
+
+    async function loadNews() {
+      const r = await fetch("/api/news");
+      if (r.ok) render(await r.json());
+    }
+
+    async function refreshNews() {
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = "Fetching live feeds...";
+      try {
+        const r = await fetch("/api/news/refresh", { method: "POST" });
+        if (r.ok) render(await r.json());
+      } finally {
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = "↻ Fetch Latest Internet News";
+      }
+    }
+
+    loadNews();
+  </script>
+</body>
+</html>

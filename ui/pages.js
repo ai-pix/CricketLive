@@ -1266,15 +1266,21 @@ if (pageType === "projected") {
     const loadNews = async () => {
       const leadBox = document.getElementById("newsLeadBox");
       const feedBox = document.getElementById("newsFeedBox");
+      let internetItems = [];
       let dbNews = [];
       try {
-        const r = await fetch("/api/stories");
-        if (r.ok) { const j = await r.json(); dbNews = j.news || []; }
+        const r = await fetch("/api/news");
+        if (r.ok) {
+          const j = await r.json();
+          internetItems = j.items || [];
+          dbNews = j.news || [];
+        }
       } catch {}
-      const crexNews = Array.isArray(data.latest_news) ? data.latest_news : [];
+      const stateNews = Array.isArray(data.latest_news) ? data.latest_news : [];
       const combined = [
-        ...crexNews.map((n) => ({ title: n.title || n.headline || "Cricket Update", summary: n.summary || n.body || "Breaking update from the live cricket newsroom.", tag: "NEWS WIRE" })),
-        ...dbNews.map((n) => ({ title: n.headline || n.title || "Studio News", summary: n.summary || n.body || "", tag: "STUDIO DESK" })),
+        ...internetItems.map((n) => ({ title: n.title || "Cricket Update", summary: n.summary || "Latest match report.", tag: (n.source || "NEWS WIRE").toUpperCase() })),
+        ...stateNews.map((n) => ({ title: n.title || n.headline || "Cricket Update", summary: n.summary || n.body || "Breaking update from the live cricket newsroom.", tag: (n.source || "NEWS WIRE").toUpperCase() })),
+        ...dbNews.map((n) => ({ title: n.headline || n.title || "Studio News", summary: n.summary || n.body || "", tag: (n.category || "NEWS DESK").toUpperCase() })),
       ];
       if (!combined.length) {
         combined.push(

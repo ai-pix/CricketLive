@@ -171,28 +171,11 @@ def _find_ffmpeg() -> str | None:
 
 
 async def get_mp3_duration_sec(mp3_bytes: bytes) -> float:
-    """Measure exact MP3 duration in seconds using FFmpeg."""
-    ffmpeg = _find_ffmpeg()
-    if not ffmpeg or not mp3_bytes:
+    """Compute MP3 duration in 0ms from 192kbps CBR byte size (with 3.5s fallback)."""
+    if not mp3_bytes:
         return 3.5
-    proc = await asyncio.create_subprocess_exec(
-        ffmpeg, "-f", "mp3", "-i", "pipe:0", "-f", "null", "-",
-        stdin=asyncio.subprocess.PIPE,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    _, stderr = await proc.communicate(input=mp3_bytes)
-    text = stderr.decode("utf-8", "ignore")
-    last_time = 0.0
-    for line in text.splitlines():
-        if "time=" in line:
-            part = line.split("time=")[-1].split()[0].strip()
-            try:
-                h, m, s = part.split(":")
-                last_time = int(h) * 3600 + int(m) * 60 + float(s)
-            except Exception:
-                pass
-    return last_time if last_time > 0.2 else 3.5
+    dur = (len(mp3_bytes) * 8.0) / 192000.0
+    return dur if dur > 0.2 else 3.5
 
 
 async def polish_audio_mp3(raw_bytes: bytes, speaker: str = "host", input_format: str = "wav") -> bytes:
@@ -224,9 +207,9 @@ async def polish_audio_mp3(raw_bytes: bytes, speaker: str = "host", input_format
 
     af_chain = (
         f"{timbre}"
-        "apad=pad_dur=0.22,"
+        "apad=pad_dur=0.06,"
         "afade=t=in:st=0:d=0.03,"
-        "areverse,afade=t=in:st=0:d=0.12,areverse,"
+        "areverse,afade=t=in:st=0:d=0.08,areverse,"
         "loudnorm=I=-16:TP=-1.5:LRA=8"
     )
     proc = await asyncio.create_subprocess_exec(
@@ -467,15 +450,98 @@ def generate_filler_dialogue(curr: ScoreboardState, _index: int = 0) -> list[Com
     return pool[chosen]
 
 
+_HI_UNITS = (
+    "शून्य", "एक", "दो", "तीन", "चार", "पाँच", "छह", "सात", "आठ", "नौ",
+    "दस", "ग्यारह", "बारह", "तेरह", "चौदह", "पंद्रह", "सोलह", "सत्रह", "अठारह", "उन्नीस",
+    "बीस", "इक्कीस", "बाईस", "तेईस", "चौबीस", "पच्चीस", "छब्बीस", "सत्ताईस", "अट्ठाईस", "उनतीस",
+    "तीस", "इकतीस", "बत्तीस", "तैंतीस", "चौंतीस", "पैंतीस", "छत्तीस", "सैंतीस", "अड़तीस", "उनतालीस",
+    "चालीस", "इकतालीस", "बयालीस", "तैंतालीस", "चवालीस", "पैंतालीस", "छियालीस", "सैंतालीस", "अड़तालीस", "उनचास",
+    "पचास", "इक्यावन", "बावन", "तिरेपन", "चौवन", "पचपन", "छप्पन", "सत्तावन", "अट्ठावन", "उनसठ",
+    "साठ", "इकसठ", "बासठ", "तिरेसठ", "चौंसठ", "पैंसठ", "छियासठ", "सड़सठ", "अड़सठ", "उनहत्तर",
+    "सत्तर", "इकहत्तर", "बहत्तर", "तिहत्तर", "चौहत्तर", "पचहत्तर", "छिहत्तर", "सतहत्तर", "अठहत्तर", "उनासी",
+    "अस्सी", "इक्यासी", "बयासी", "तिरासी", "चौरासी", "पचासी", "छियासी", "सत्तासी", "अट्ठासी", "नवासी",
+    "नब्बे", "इक्यानबे", "बानवे", "तिरानवे", "चौरानवे", "पचानवे", "छियानवे", "सत्तानवे", "अट्ठानवे", "निन्यानवे",
+)
+
+
+def _int_to_hindi(n: int) -> str:
+    if n < 0:
+        return f"माइनस {_int_to_hindi(-n)}"
+    if n < 100:
+        return _HI_UNITS[n]
+    if n < 1000:
+        h, rem = divmod(n, 100)
+        base = f"{_HI_UNITS[h]} सौ"
+        return f"{base} {_int_to_hindi(rem)}" if rem else base
+    if n < 100000:
+        th, rem = divmod(n, 1000)
+        base = f"{_int_to_hindi(th)} हज़ार"
+        return f"{base} {_int_to_hindi(rem)}" if rem else base
+    lk, rem = divmod(n, 100000)
+    base = f"{_int_to_hindi(lk)} लाख"
+    return f"{base} {_int_to_hindi(rem)}" if rem else base
+
+
+def _expand_numbers_to_hindi(text: str) -> str:
+    """Convert ASCII numbers, decimals, and #ranks into natural Hindi words for clear TTS pronunciation."""
+    import re
+
+    # #1, #2, etc. -> नंबर एक, नंबर दो
+    text = re.sub(r"#(\d+)", lambda m: f"नंबर {_int_to_hindi(int(m.group(1)))}", text)
+    # Score like 180/4 -> एक सौ अस्सी पर चार
+    text = re.sub(
+        r"\b(\d{1,3})/(\d{1,2})\b",
+        lambda m: f"{_int_to_hindi(int(m.group(1)))} पर {_int_to_hindi(int(m.group(2)))}",
+        text,
+    )
+    # Decimals like 40.4 or 5.25 -> चालीस दशमलव चार / पाँच दशमलव दो पाँच
+    def _dec_repl(m: re.Match) -> str:
+        whole = _int_to_hindi(int(m.group(1)))
+        frac_str = m.group(2)
+        if len(frac_str) == 1:
+            return f"{whole} दशमलव {_HI_UNITS[int(frac_str)]}"
+        digits = " ".join(_HI_UNITS[int(ch)] for ch in frac_str)
+        return f"{whole} दशमलव {digits}"
+
+    text = re.sub(r"\b(\d+)\.(\d+)\b", _dec_repl, text)
+    # Standalone integers (up to 6 digits)
+    text = re.sub(r"\b(\d{1,6})\b", lambda m: _int_to_hindi(int(m.group(1))), text)
+    return text
+
+
 def _format_spoken_prosody(text: str, speaker: str, mood: str) -> str:
-    """Shape lively, interested conversational Hindi delivery with crisp pauses for Fish Audio S2.1-Pro."""
+    """Shape clean, natural Hindi delivery with cricket abbreviation & number expansion for Fish Audio S2.1-Pro."""
+    import re
+
     out = text.strip()
     if not out:
         return out
-    # Crisp conversational comma pauses (avoid heavy '...' everywhere which causes sleepy/flat cadence)
     out = out.replace(" — ", ", ").replace(" —", ",").replace("—", ", ")
+    # Expand raw CREX/scoreboard abbreviations into natural spoken Hindi so TTS never switches to English/foreign tokens
+    out = re.sub(r"^(?:WD|wd)\b\s*", "वाइड बॉल, ", out)
+    out = re.sub(r"^(?:NB|nb)\b\s*", "नो बॉल, ", out)
+    out = re.sub(r"^(?:LB|lb)\b\s*", "लेग बाई, ", out)
+    out = re.sub(r"^0\s+", "डॉट बॉल, ", out)
+    out = re.sub(r"^1\s+", "एक रन, ", out)
+    out = re.sub(r"^2\s+", "दो रन, ", out)
+    out = re.sub(r"^3\s+", "तीन रन, ", out)
+    out = re.sub(r"^4\s+", "चौका, ", out)
+    out = re.sub(r"^6\s+", "छक्का, ", out)
+    for en, hi in (
+        (r"\bMOST RUNS\b", "सबसे ज़्यादा रन"),
+        (r"\bMOST WICKETS\b", "सबसे ज़्यादा विकेट"),
+        (r"\bMOST SIXES\b", "सबसे ज़्यादा छक्के"),
+        (r"\bBEST STRIKE RATE\b", "सर्वश्रेष्ठ स्ट्राइक रेट"),
+        (r"\bWD\b", "वाइड"),
+        (r"\bNB\b", "नो बॉल"),
+        (r"\bLB\b", "लेग बाई"),
+        (r"\bSR\b", "स्ट्राइक रेट"),
+    ):
+        out = re.sub(en, hi, out, flags=re.I)
+
+    out = _expand_numbers_to_hindi(out)
+
     if speaker == "host":
-        # Keep female Host upbeat, bright, and genuinely engaged
         if mood == "excited" and not out.startswith("[excited]"):
             out = f"[excited] {out}"
         elif mood == "conversational" and not out.startswith("["):
@@ -514,7 +580,7 @@ async def synthesize_fish_audio(
 
     model_name = os.getenv("FISH_MODEL", "s2.1-pro-free")
     digest = hashlib.sha256(
-        f"v5|{speaker}|{mood}|{prosody_speed}|{reference_id}|{model_name}|{spoken_text}".encode("utf-8")
+        f"v6|{speaker}|{mood}|{prosody_speed}|{reference_id}|{model_name}|{spoken_text}".encode("utf-8")
     ).hexdigest()[:24]
     TTS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
     disk_path = TTS_CACHE_DIR / f"{speaker}_{digest}.mp3"
@@ -544,6 +610,8 @@ async def synthesize_fish_audio(
             resp = await client.post(FISH_TTS_URL, json=payload, headers=headers)
             resp.raise_for_status()
             polished = await polish_audio_mp3(resp.content, speaker=speaker, input_format="wav")
+            if len(_tts_cache) > 120:
+                _tts_cache.pop(next(iter(_tts_cache)), None)
             _tts_cache[cache_key] = polished
             try:
                 disk_path.write_bytes(polished)

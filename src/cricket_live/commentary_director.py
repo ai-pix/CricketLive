@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass
 
 from .db import get_all_stories, get_news_items, pick_next_story
-from .llm_director import generate_llm_segment, is_llm_configured
+from .llm_director import generate_live_ball_llm_turns, generate_llm_segment, is_llm_configured
 from .models import ScoreboardState
 
 # Turn tuple: (speaker: "host" | "expert", text: str, tag: str)
@@ -112,12 +112,12 @@ def extract_crex_ball(raw: str) -> tuple[str, str]:
     txt = (raw or "").strip()
     m = re.match(r"^(\d+\.\d+)\s+(.+)$", txt)
     if not m:
-        return ("", txt[:260])
+        return ("", txt[:600])
     ball_id = m.group(1)
     body = m.group(2).strip()
     # Strip trailing duplicate/noise tags if any
     body = re.sub(r"\s+(?:OUT|4s/6s|Wkt\s*#\d+).*$", "", body).strip()
-    return (ball_id, body[:260])
+    return (ball_id, body[:600])
 
 
 # ---------------------------------------------------------------------------
@@ -127,52 +127,43 @@ RULES_AND_CRAFT_LIBRARY: list[tuple[str, list[tuple[str, str]]]] = [
     (
         "impact_player_tactics",
         [
-            ("host", "टी20 लीग्स में इम्पैक्ट प्लेयर नियम ने टीमों की बल्लेबाज़ी गहराई को पूरी तरह बदल दिया है। पहले जहाँ छठे विकेट के बाद टीम संभलकर खेलती थी, अब नंबर आठ तक बड़े हिटर दिखते हैं।"),
-            ("expert", "बिल्कुल सही कहा! इसका सीधा असर गेंदबाज़ों की रणनीति पर पड़ा है। पहले कप्तान सोचते थे कि दो विकेट लेकर मिडल ऑर्डर पर दबाव बना देंगे, लेकिन अब इम्पैक्ट सब आने से पार स्कोर ही पंद्रह से बीस रन ऊपर खिसक गया है। ऐसे में गेंदबाज़ों के पास डिफेंस करने की जगह हर ओवर में विकेट लेने की तलाश ही सबसे बड़ा हथियार बचती है।"),
+            ("expert", "टी20 और आधुनिक सीमित ओवर क्रिकेट में बल्लेबाज़ी की गहराई पूरी तरह बदल चुकी है। पहले छठे विकेट के बाद टीम संभलकर खेलती थी, अब नंबर आठ तक बड़े हिटर नज़र आते हैं, जिससे पार स्कोर पंद्रह से बीस रन ऊपर खिसक गया है और गेंदबाज़ों के पास हर ओवर में विकेट तलाशने के अलावा कोई विकल्प नहीं बचता।"),
         ],
     ),
     (
         "dew_and_magnus_physics",
         [
-            ("host", "शाम के मैचों में जैसे-जैसे फ्लडलाइट्स चमकती हैं, मैदान पर ओस यानी ड्यू की चर्चा हर ड्रेसिंग रूम में शुरू हो जाती है।"),
-            ("expert", "देखो इसके पीछे सीधा सा साइंस है। जब आउटफील्ड पर ओस जमती है, तो गेंद की सिलाई यानी सीम पर हल्की नमी आ जाती है। इससे स्पिनरों की उंगलियों की ग्रिप फिसलती है और तेज़ गेंदबाज़ों का यॉर्कर थोड़ा स्किड होकर सीधे बल्ले के बीच में आता है! इसलिए दूसरी पारी में बल्लेबाज़ी ज़्यादातर आसान हो जाती है।"),
-            ("host", "यानी गेंदबाज़ बार-बार तौलिए से गेंद सुखाते नज़र आते हैं, लेकिन बल्लेबाज़ के चेहरे पर मुस्कान आ जाती है!"),
+            ("expert", "शाम के मुकाबलों में जब आउटफील्ड पर ओस यानी ड्यू जमती है, तो गेंद की सिलाई यानी सीम पर हल्की नमी आ जाती है। इससे स्पिनरों की उंगलियों की ग्रिप फिसलती है और तेज़ गेंदबाज़ों का यॉर्कर स्किड होकर सीधे बल्ले के बीच में आता है, जिससे दूसरी पारी में बल्लेबाज़ी अक्सर आसान हो जाती है।"),
         ],
     ),
     (
         "cutter_vs_yorker_death",
         [
-            ("host", "डेथ ओवर्स में आजकल रफ्तार से ज़्यादा वेरिएशन देखने को मिलती है — कोई वाइड यॉर्कर डाल रहा है तो कोई ऑफ-कटर।"),
-            ("expert", "सही बात है। आज के बैटर बैट स्पीड से एक सौ चालीस की सीधी गेंद को आसानी से स्टैंड्स में भेज देते हैं। इसलिए स्मार्ट बॉलर सीम को हल्का तिरछा पकड़कर उंगलियां गेंद के साइड में चलाता है — जिसे हम कटर कहते हैं। पिच पर टप्पा खाने के बाद गेंद थोड़ा रुककर आती है और बल्लेबाज़ शॉट पहले पूरा कर बैठता है, नतीजा हवा में ऊँचा कैच!"),
+            ("expert", "डेथ ओवर्स में आजकल रफ्तार से ज़्यादा वेरिएशन काम आती है। आज के बल्लेबाज़ बैट स्पीड से एक सौ चालीस की सीधी गेंद को आसानी से स्टैंड्स में भेज देते हैं, इसलिए स्मार्ट गेंदबाज़ सीम को हल्का तिरछा पकड़कर ऑफ़-कटर या वाइड यॉर्कर डालता है ताकि गेंद रुककर आए और बल्लेबाज़ शॉट पहले पूरा कर बैठे।"),
         ],
     ),
     (
         "powerplay_vs_middle_field",
         [
-            ("host", "पावरप्ले के बाद जब पांच फील्डर बाहर जाते हैं, तो गेम की पूरी चाल एकदम से बदल जाती है।"),
-            ("expert", "जी हाँ! शुरुआती छह ओवरों में तीस गज के दायरे में नौ खिलाड़ी होने की वजह से बल्लेबाज़ ऊपर से मारने का रिस्क लेता है। लेकिन सातवें ओवर से बाउंड्री पर पांच फील्डर फैलते ही चौका निकालना कठिन हो जाता है, और पूरा खेल स्ट्राइक रोटेट करने तथा बड़े पॉकेट्स ढूंढने पर आ जाता है। यहीं पर डॉट बॉल्स का प्रेशर विकेट दिलाता है।"),
-            ("host", "बिल्कुल, और जो जोड़ी बीच के ओवरों में बिना रिस्क लिए आठ के करीब रनरेट चला ले, वो मैच आधी जीत वहीं तय कर देती है।"),
+            ("expert", "पावरप्ले के बाद जब पांच फील्डर तीस गज के दायरे से बाहर फैलते हैं, तो खेल की पूरी चाल बदल जाती है। सातवें ओवर से बाउंड्री निकालना कठिन हो जाता है, और पूरा मुकाबला स्ट्राइक रोटेट करने तथा बड़े पॉकेट्स ढूंढने पर आ जाता है — यहीं पर डॉट बॉल्स का दबाव विकेट दिलाता है।"),
         ],
     ),
     (
         "boundary_relay_catches",
         [
-            ("host", "क्रिकेट में पहले जो शॉट बिना सोचे छह रन माने जाते थे, आजकल बाउंड्री रोप पर फील्डर उन्हें भी कैच में बदल रहे हैं।"),
-            ("expert", "रिले कैचिंग ने खेल का स्तर ही बदल दिया है! नियम साफ कहता है कि हवा में उछलकर गेंद पकड़ते समय खिलाड़ी का पहला संपर्क बाउंड्री के अंदर से होना चाहिए और रोप को छूने से पहले गेंद हाथ से छूट जानी चाहिए। खिलाड़ियों की एथलेटिक फिटनेस और आपसी तालमेल ने आज बल्लेबाज़ों की सांसें अटका रखी हैं।"),
+            ("expert", "आधुनिक क्रिकेट में बाउंड्री रोप पर रिले कैचिंग ने खेल का स्तर ही बदल दिया है। नियम साफ कहता है कि हवा में उछलकर गेंद पकड़ते समय खिलाड़ी का पहला संपर्क बाउंड्री के अंदर से होना चाहिए और रोप को छूने से पहले गेंद हाथ से छूट जानी चाहिए — खिलाड़ियों की एथलेटिक फिटनेस ने आज बल्लेबाज़ों के लिए हर बड़ा शॉट जोखिम भरा बना दिया है।"),
         ],
     ),
     (
         "anchor_vs_intent_paradox",
         [
-            ("host", "टी20 क्रिकेट में हमेशा एक बहस चलती है — क्या टीम को एक एंकर बल्लेबाज़ चाहिए जो सोलहवें ओवर तक टिके, या सभी को पहले बॉल से ही अटैक करना चाहिए?"),
-            ("expert", "इसका जवाब पिच तय करती है भाई! अगर स्कोर दो सौ दस का बन रहा हो, तो धीमी पारी टीम को हरा सकती है। लेकिन जब गेंद रुककर आ रही हो और पावरप्ले में तीन विकेट गिर जाएं, तो एक शांत एंकर दूसरे छोर से पूरी पारी को बांधकर रखता है ताकि बाकी बल्लेबाज़ खुलकर खेल सकें।"),
+            ("expert", "सीमित ओवर क्रिकेट में एंकर बल्लेबाज़ की भूमिका हमेशा पिच तय करती है। जब गेंद रुककर आ रही हो और शुरुआती विकेट गिर जाएं, तो एक शांत एंकर दूसरे छोर से पूरी पारी को बांधकर रखता है ताकि बाकी बल्लेबाज़ खुलकर खेल सकें और आखिरी दस ओवरों में तेज़ी से रन बटोर सकें।"),
         ],
     ),
     (
         "bowler_captain_angle",
         [
-            ("host", "जब किसी सेट बल्लेबाज़ को रोकना हो, तो गेंदबाज़ के साथ-साथ कप्तान की फील्ड सेटिंग भी आधी गेंदबाज़ी करती है।"),
-            ("expert", "बिल्कुल! अगर आप लेग-स्टंप के बाहर फील्डर सजाकर वाइड ऑफ़ यॉर्कर डालोगे, तो बल्लेबाज़ को ताकत अपनी तरफ से पैदा करनी पड़ेगी। कप्तान का काम बस इतना होता है कि वो गेंदबाज़ के प्लान के मुताबिक कम से कम सात फील्डर एक ही तरफ लॉक कर दे — इसे ही असली क्रिकेट की बिसात कहते हैं!"),
+            ("expert", "जब किसी सेट बल्लेबाज़ को रोकना हो, तो गेंदबाज़ के साथ-साथ कप्तान की फील्ड सेटिंग आधी गेंदबाज़ी करती है। लेग-स्टंप के बाहर फील्डर सजाकर वाइड ऑफ़ यॉर्कर डालने से बल्लेबाज़ को ताकत अपनी तरफ से पैदा करनी पड़ती है, और एक तरफ सात फील्डर लॉक करके गेंदबाज़ सीधा जाल बुन सकता है।"),
         ],
     ),
 ]
@@ -202,7 +193,9 @@ def build_live_ball_turns(
     last_ball = curr.curr_over.balls[-1].upper() if curr.curr_over.balls else ""
 
     ball_id, crex_hindi = extract_crex_ball(curr.live_commentary)
-    fresh_crex = bool(crex_hindi and (not ball_id or ball_id != last_spoken_ball_id))
+    has_hindi_text = bool(re.search(r"[\u0900-\u097F]", crex_hindi or ""))
+    fresh_crex = bool(crex_hindi and ((ball_id and ball_id != last_spoken_ball_id) or (not ball_id and crex_hindi[:80] != last_spoken_ball_id)))
+    crex_key = ball_id or (crex_hindi[:80] if crex_hindi else "")
 
     # 1. WICKET — Accordion escalation + multi-sentence Expert tactical analysis
     if wicket_fell or (overs_changed and last_ball == "W"):
@@ -237,7 +230,7 @@ def build_live_ball_turns(
                     "over_recap",
                 )
             )
-        return (turns, ball_id or last_spoken_ball_id)
+        return (turns, crex_key or last_spoken_ball_id)
 
     # 2. SIX — Crowd escalation + dynamic reaction
     if score_diff >= 6 or (overs_changed and last_ball == "6"):
@@ -260,7 +253,7 @@ def build_live_ball_turns(
                 f"इस छक्के ने {bowler} की पूरी लय हिला दी है! अब अगले दो गेंदों पर कप्तान को फील्डिंग बदलने पर मजबूर होना पड़ेगा।",
             ],
         )
-        return ([("host", call_line, "live_six"), ("expert", expert_line, "live_six_analysis")], ball_id or last_spoken_ball_id)
+        return ([("host", call_line, "live_six"), ("expert", expert_line, "live_six_analysis")], crex_key or last_spoken_ball_id)
 
     # 3. FOUR — Sharp boundary call + technical praise
     if score_diff == 4 or (overs_changed and last_ball == "4"):
@@ -282,7 +275,7 @@ def build_live_ball_turns(
                 f"बहुत बढ़िया शॉट चयन! {striker} ने हवा में रिस्क लेने के बजाय ज़मीन के रास्ते चौका बटोरा, और इससे स्कोरबोर्ड को अच्छी गति मिली।",
             ],
         )
-        return ([("host", call_line, "live_four"), ("expert", expert_line, "live_four_analysis")], ball_id or last_spoken_ball_id)
+        return ([("host", call_line, "live_four"), ("expert", expert_line, "live_four_analysis")], crex_key or last_spoken_ball_id)
 
     # 4. OVER COMPLETED — Dedicated Over-Break Recap & Tactical Shift
     if ctx.over_completed:
@@ -307,13 +300,11 @@ def build_live_ball_turns(
                 f"बिल्कुल संतुलित ओवर रहा। {team} जानती है कि हाथ में अभी {10 - curr.wickets} विकेट बाकी हैं, इसलिए अगले दो ओवरों में कम से कम एक बाउंड्री प्रति ओवर निकालनी ज़रूरी होगी ताकि रन गति नीचे न गिरे।",
             ],
         )
-        return ([("host", host_recap, "over_break"), ("expert", expert_shift, "over_break_tactics")], ball_id or last_spoken_ball_id)
+        return ([("host", host_recap, "over_break"), ("expert", expert_shift, "over_break_tactics")], crex_key or last_spoken_ball_id)
 
-    # 5. ROUTINE BALL / CREX LIVE DESCRIPTION (Concise natural call, alternating speaker subtly)
+    # 5. ROUTINE BALL / CREX LIVE DESCRIPTION (Exact CREX commentary)
     if fresh_crex:
-        # Let Host call most deliveries, occasionally let Expert chime in on quiet dots/singles
-        speaker = "host" if score_diff > 0 or random.random() < 0.72 else "expert"
-        return ([(speaker, crex_hindi, "live_crex_ball")], ball_id or last_spoken_ball_id)
+        return ([("expert", crex_hindi, "live_crex_ball")], crex_key or last_spoken_ball_id)
 
     if score_diff > 0:
         line = deck.pick(
@@ -340,6 +331,38 @@ def build_live_ball_turns(
         return ([("host", line, "live_dot")], last_spoken_ball_id)
 
     return ([], last_spoken_ball_id)
+
+
+async def build_live_ball_turns_async(
+    prev: ScoreboardState | None,
+    curr: ScoreboardState,
+    deck: NoRepeatDeck,
+    last_spoken_ball_id: str = "",
+    recent_lines: list[str] | None = None,
+) -> tuple[list[DirectedTurn], str]:
+    """Pass live CREX commentary + ball event through the LLM so the solo Expert refines and decides what to say."""
+    fallback_turns, new_ball_id = build_live_ball_turns(prev, curr, deck, last_spoken_ball_id)
+    expert_fallback = [("expert", text, tag) for _, text, tag in fallback_turns]
+
+    if prev is None:
+        return ([], last_spoken_ball_id)
+
+    ball_id, crex_hindi = extract_crex_ball(curr.live_commentary)
+    is_fresh_crex = bool(crex_hindi and ((ball_id and ball_id != last_spoken_ball_id) or (not ball_id and crex_hindi[:80] != last_spoken_ball_id)))
+    crex_source = crex_hindi if is_fresh_crex else ""
+    if is_llm_configured() and (crex_source or expert_fallback):
+        ball_tag = expert_fallback[0][2] if expert_fallback else "live_crex_ball"
+        llm_turns = await generate_live_ball_llm_turns(
+            prev=prev,
+            curr=curr,
+            crex_text=crex_source,
+            recent_lines=recent_lines or [],
+            tag=ball_tag,
+        )
+        if llm_turns:
+            return (llm_turns, new_ball_id or ball_id or last_spoken_ball_id)
+
+    return (expert_fallback, new_ball_id)
 
 
 # ---------------------------------------------------------------------------
@@ -411,11 +434,11 @@ def pick_spotlight_slide(tag: str, state: ScoreboardState, deck: NoRepeatDeck) -
 
 def _choose_phase_topic(state: ScoreboardState, deck: NoRepeatDeck) -> str:
     ctx = analyze_context(None, state)
-    topics = ["situation", "matchup", "pitch_weather", "points_series", "form_h2h_poll", "crex_news", "db_story", "rules_craft", "crex_news", "db_story"]
+    topics = ["situation", "matchup", "pitch_weather", "points_series", "form_h2h_poll", "rules_craft"]
     if ctx.chase_pressure == "crunch" or ctx.phase == "death":
-        weighted = ["situation", "matchup", "pitch_weather", "crex_news", "points_series", "rules_craft", "db_story"]
+        weighted = ["situation", "matchup", "pitch_weather", "points_series", "rules_craft"]
     elif ctx.phase == "powerplay":
-        weighted = ["matchup", "pitch_weather", "form_h2h_poll", "crex_news", "rules_craft", "db_story"]
+        weighted = ["matchup", "pitch_weather", "form_h2h_poll", "rules_craft"]
     else:
         weighted = topics
     return str(deck.pick("segment_topic", weighted))
@@ -512,7 +535,7 @@ def _spoken_form(items: list[str] | None) -> str:
 def build_next_segment(
     state: ScoreboardState, deck: NoRepeatDeck, forced_topic: str | None = None
 ) -> list[DirectedTurn]:
-    """Generate a cohesive, natural 2-to-4-turn conversation segment with varied turn lengths."""
+    """Generate a cohesive, natural solo Expert Hindi commentary segment (no host, no conversation)."""
     ctx = analyze_context(None, state)
     team = _spoken_team(state.batting_team, "टीम")
     bowl_team = _spoken_team(state.bowling_team, "गेंदबाज़ी टीम")
@@ -523,35 +546,29 @@ def build_next_segment(
 
     topic = forced_topic or _choose_phase_topic(state, deck)
 
-    # 1. MATCH SITUATION & MILESTONE / CHASE WATCH (3 non-repeating angles)
+    # 1. MATCH SITUATION & MILESTONE / CHASE WATCH
     if topic == "situation":
         if ctx.striker_near_50:
             return [
-                ("host", f"नज़रें इस वक्त {striker} पर टिकी हैं जो {state.striker.runs} रन बनाकर अपने अर्धशतक से सिर्फ {50 - state.striker.runs} रन दूर खड़े हैं।", "seg_situation"),
-                ("expert", f"सही कहा! जब बल्लेबाज़ चालीस के पार पहुँचता है, तो दो चीज़ें काम आती हैं — एक तो रिस्क न लेना, और दूसरा गैप्स में सिंगल निकालकर मील के पत्थर तक शांत मन से पहुँचना। {striker} ने अभी तक {state.striker.fours} चौके और {state.striker.sixes} छक्के लगाए हैं, जो बताता है कि गेंद बल्ले पर बढ़िया आ रही है।", "seg_situation"),
-                ("host", f"और टीम को भी उनकी इस पारी की सख्त ज़रूरत है क्योंकि {team} अभी {state.overs} ओवर में {state.runs} पर {state.wickets} है।", "seg_situation"),
+                ("expert", f"नज़रें इस वक्त {striker} पर टिकी हैं जो {state.striker.runs} रन बनाकर अपने अर्धशतक से सिर्फ {50 - state.striker.runs} रन दूर हैं। {striker} ने अब तक {state.striker.fours} चौके और {state.striker.sixes} छक्के जड़े हैं, और {team} को {state.overs} ओवर में {state.runs} पर {state.wickets} के स्कोर से आगे ले जाने की ज़िम्मेदारी इन्हीं के कंधों पर है।", "seg_situation"),
             ]
         angle = deck.pick("situation_angle", ["chase_math", "wicket_depth", "projected_window"])
         if ctx.is_chase and angle == "chase_math":
             return [
-                ("host", f"समीकरण पर नज़र डालें तो {team} को अभी जीत के लिए {ctx.balls_remaining} गेंदों में {ctx.runs_needed} रन की ज़रूरत है।", "seg_situation"),
-                ("expert", f"देखो वर्तमान रन रेट {state.crr:.2f} है जबकि रिक्वायर्ड रन रेट {state.rrr:.2f} तक पहुँच चुका है। ऐसे चेज़ में सबसे ज़रूरी होता है कि पार्टनरशिप टूटे नहीं और हर ओवर में कम से कम एक बाउंड्री आती रहे। अभी {striker} और {non_striker} के बीच {state.partnership} की साझेदारी चल रही है — अगर यह जोड़ी चार ओवर और टिक गई तो मुकाबला पूरा पलट सकता है।", "seg_situation"),
-                ("host", f"बिल्कुल, वहीं {bowl_team} चाहेगी कि किसी तरह एक और विकेट चटकाकर नए बल्लेबाज़ों को क्रीज़ पर लाया जाए।", "seg_situation"),
+                ("expert", f"समीकरण बिल्कुल साफ है — {team} को जीत के लिए {ctx.balls_remaining} गेंदों में {ctx.runs_needed} रन की ज़रूरत है। वर्तमान रन रेट {state.crr:.2f} और रिक्वायर्ड रन रेट {state.rrr:.2f} है, ऐसे में {striker} और {non_striker} की {state.partnership} की साझेदारी इस लक्ष्य की रीढ़ बन चुकी है, जबकि {bowl_team} एक विकेट चटकाकर दबाव वापस बनाना चाहेगी।", "seg_situation"),
             ]
         if angle == "wicket_depth":
             return [
-                ("expert", f"क्रिकेट के स्कोरकार्ड में अभी {team} का स्कोर {state.runs} पर {state.wickets} दिख रहा है। हाथ में अभी {10 - curr_wkts(state)} विकेट बाकी हैं, जिसका सीधा मतलब है कि बल्लेबाज़ अगले तीन ओवर में गियर बदल सकते हैं।", "seg_situation"),
-                ("host", f"बिल्कुल! खासकर {striker} और {non_striker} की {state.partnership} वाली साझेदारी इस पूरी पारी की रीढ़ बन चुकी है।", "seg_situation"),
+                ("expert", f"स्कोरकार्ड पर {team} का स्कोर {state.runs} पर {state.wickets} है और हाथ में अभी {10 - curr_wkts(state)} विकेट बाकी हैं। {striker} और {non_striker} के बीच {state.partnership} की साझेदारी टीम को मज़बूत आधार दे रही है, जिससे आने वाले ओवरों में तेज़ी से गियर बदलने का पूरा मौका रहेगा।", "seg_situation"),
             ]
         rem_ov = max(0.0, (20.0 if ctx.overs_float <= 20.5 else 50.0) - ctx.overs_float)
         proj_curr = round(state.runs + rem_ov * state.crr)
         proj_plus = round(state.runs + rem_ov * (state.crr + 1.5))
         return [
-            ("host", f"प्रोजेक्टेड स्कोर मैट्रिक्स देखें तो अगर {team} इसी {state.crr:.2f} के रन रेट से चलती रही, तो स्कोर करीब {proj_curr} तक जाएगा, लेकिन डेढ़ रन रेट बढ़ने पर {proj_plus} भी मुमकिन है।", "seg_situation"),
-            ("expert", f"और यही पंद्रह से बीस रन का अंतर आखिरी ओवर में जीत और हार के बीच की रेखा बन जाता है। इसलिए {bowl_team} इस समय डॉट बॉल प्रतिशत बढ़ाने पर पूरा जोर लगा रही है।", "seg_situation"),
+            ("expert", f"प्रोजेक्टेड स्कोर पर नज़र डालें तो {team} इसी {state.crr:.2f} के रन रेट से करीब {proj_curr} तक पहुँच सकती है, लेकिन रफ़्तार बढ़ने पर {proj_plus} भी मुमकिन है। यही कारण है कि {bowl_team} इस समय डॉट बॉल प्रतिशत बढ़ाकर रनों की गति पर लगाम लगाने की कोशिश कर रही है।", "seg_situation"),
         ]
 
-    # 2. BATTER vs BOWLER MATCHUP & LEADERS (3 non-repeating angles)
+    # 2. BATTER vs BOWLER MATCHUP & LEADERS
     if topic == "matchup":
         angle = deck.pick("matchup_angle", ["crex_duel", "innings_leaders", "boundary_ratio"])
         if angle == "innings_leaders":
@@ -560,21 +577,18 @@ def build_next_segment(
             t_bat = f"{top_bat.name.title()} ({top_bat.runs} रन)" if top_bat else striker
             t_bowl = f"{top_bowl.name.title()} ({top_bowl.wickets} विकेट)" if top_bowl else bowler
             return [
-                ("host", f"आज के स्कोरकार्ड के टॉप परफ़ॉर्मर्स देखें तो बल्लेबाज़ी में {t_bat} और गेंदबाज़ी में {t_bowl} ने सबसे गहरी छाप छोड़ी है।", "seg_matchup"),
-                ("expert", "जब दो खिलाड़ी पूरे दिन के सर्वश्रेष्ठ फॉर्म में हों और मैच के अहम चरण में सामने आते हैं, तो पूरा मैच उन्हीं के इर्द-गिर्द घूमने लगता है। बाकी साथियों का काम बस स्ट्राइक रोटेट कर उन्हें ज़्यादा से ज़्यादा गेंदें देना होता है।", "seg_matchup"),
+                ("expert", f"इस मुकाबले के टॉप परफ़ॉर्मर्स पर नज़र डालें तो बल्लेबाज़ी में {t_bat} और गेंदबाज़ी में {t_bowl} ने सबसे गहरी छाप छोड़ी है। जब दो खिलाड़ी बेहतरीन लय में हों, तो मैच के अहम चरण में उन्हीं की टक्कर मुकाबले की दिशा तय करती है।", "seg_matchup"),
             ]
         if angle == "boundary_ratio":
             bnd_runs = state.striker.fours * 4 + state.striker.sixes * 6
             return [
-                ("expert", f"{striker} की पारी का विश्लेषण करें तो उनके {state.striker.runs} रनों में से {bnd_runs} रन सिर्फ चौकों और छक्कों से आए हैं। यानी बाउंड्री के साथ-साथ वे सिंगल और डबल भी लगातार निकाल रहे हैं, जो किसी भी गेंदबाज़ की लाइन बिगाड़ने के लिए काफी होता है।", "seg_matchup"),
-                ("host", f"दूसरे छोर पर {non_striker} भी {state.non_striker.runs} रन बनाकर बढ़िया साथ निभा रहे हैं।", "seg_matchup"),
+                ("expert", f"{striker} की पारी का विश्लेषण करें तो उनके {state.striker.runs} रनों में से {bnd_runs} रन चौकों और छक्कों से आए हैं। बाउंड्री के साथ सिंगल-डबल निकालकर वे लगातार स्ट्राइक रोटेट कर रहे हैं, और दूसरे छोर पर {non_striker} {state.non_striker.runs} रन बनाकर बढ़िया साथ निभा रहे हैं।", "seg_matchup"),
             ]
         return [
-            ("host", f"क्रीज़ पर इस समय बेहद दिलचस्प टक्कर चल रही है — {striker} ({state.striker.runs} रन, स्ट्राइक रेट {state.striker.strike_rate:.1f}) के सामने गेंदबाज़ी पर {bowler}।", "seg_matchup"),
-            ("expert", f"{bowler} ने {state.bowler.overs} ओवर में {state.bowler.runs_conceded} रन देकर {state.bowler.wickets} विकेट निकाले हैं, इकॉनमी सिर्फ {state.bowler.economy:.2f} की रही है। यही छोटा-सा द्वंद्व तय करेगा कि अगले तीन ओवरों में किसका पलड़ा भारी रहता है।", "seg_matchup"),
+            ("expert", f"क्रीज़ पर इस समय बेहद दिलचस्प टक्कर चल रही है — {striker} ({state.striker.runs} रन, स्ट्राइक रेट {state.striker.strike_rate:.1f}) के सामने गेंदबाज़ी पर {bowler} हैं, जिन्होंने {state.bowler.overs} ओवर में {state.bowler.runs_conceded} रन देकर {state.bowler.wickets} विकेट निकाले हैं।", "seg_matchup"),
         ]
 
-    # 3. CREX PITCH, WEATHER & PACE vs SPIN (3 non-repeating angles)
+    # 3. CREX PITCH, WEATHER & PACE vs SPIN
     if topic == "pitch_weather":
         vs = state.venue_stats or {}
         w = state.weather or {}
@@ -583,20 +597,17 @@ def build_next_segment(
             raw_temp = str(w.get("temp") or "").strip()
             safe_temp = "25°C" if not raw_temp or raw_temp.startswith("0") else raw_temp
             return [
-                ("host", f"{venue} में मौसम बिल्कुल साफ है — तापमान {safe_temp} और ह्यूमिडिटी {w.get('humidity', '68%')} के करीब दर्ज की गई है।", "seg_pitch"),
-                ("expert", "नमी जब सत्तर प्रतिशत के आसपास पहुँचती है, तो रात के मुकाबले में ओस पड़ने की संभावना बढ़ जाती है। इससे स्विंग धीरे-धीरे कम होती है और गेंद बैट पर थोड़ा फिसलकर आती है, जिसका सीधा फायदा दूसरी पारी के बल्लेबाज़ों को मिलता है।", "seg_pitch"),
+                ("expert", f"{venue} में मौसम बिल्कुल साफ है — तापमान {safe_temp} और ह्यूमिडिटी {w.get('humidity', '68%')} के करीब है। नमी बढ़ने पर रात के मुकाबले में ओस का असर दिख सकता है, जिससे गेंद बल्ले पर थोड़ी फिसलकर आती है और बल्लेबाज़ों को शॉट खेलने में आसानी होती है।", "seg_pitch"),
             ]
         if angle == "venue_par":
             return [
-                ("host", f"{venue} के ऐतिहासिक आंकड़ों में पहली पारी का औसत स्कोर {vs.get('avg_1st', 165)} और दूसरी पारी का औसत {vs.get('avg_2nd', 150)} रहा है।", "seg_pitch"),
-                ("expert", f"यहाँ अब तक खेले गए {vs.get('matches', 45)} मुकाबलों में हाईएस्ट चेज़ {vs.get('highest_chased', '193/5')} रहा है। यानी बड़े लक्ष्य का पीछा करना मुश्किल ज़रूर है, पर नामुमकिन नहीं — बशर्ते पावरप्ले के बाद विकेट बचाकर रखे जाएं।", "seg_pitch"),
+                ("expert", f"{venue} के आंकड़ों में पहली पारी का औसत स्कोर {vs.get('avg_1st', 165)} और दूसरी पारी का औसत {vs.get('avg_2nd', 150)} रहा है। यहाँ {vs.get('matches', 45)} मुकाबलों में हाईएस्ट चेज़ {vs.get('highest_chased', '193/5')} रहा है, यानी अगर विकेट हाथ में रहें तो बड़े लक्ष्य का पीछा संभव है।", "seg_pitch"),
             ]
         return [
-            ("expert", f"इस मैदान पर पिछले दस मैचों का बॉलिंग ब्रेकडाउन देखें तो तेज़ गेंदबाज़ों ने {vs.get('pace_wkts', 84)} विकेट यानी {vs.get('pace_pct', 59)} प्रतिशत शिकार किए हैं, जबकि स्पिनरों को {vs.get('spin_wkts', 58)} विकेट ({vs.get('spin_pct', 41)} प्रतिशत) मिले हैं।", "seg_pitch"),
-            ("host", f"और टॉस भी बड़ा रोल निभाता है क्योंकि यहाँ पहले गेंदबाज़ी करने वाली टीम {vs.get('win_bowl_first', 52)} प्रतिशत मैच जीत चुकी है।", "seg_pitch"),
+            ("expert", f"इस मैदान पर पिछले दस मैचों में तेज़ गेंदबाज़ों ने {vs.get('pace_wkts', 84)} विकेट ({vs.get('pace_pct', 59)} प्रतिशत) और स्पिनरों ने {vs.get('spin_wkts', 58)} विकेट ({vs.get('spin_pct', 41)} प्रतिशत) झटके हैं, जबकि पहले गेंदबाज़ी करने वाली टीम {vs.get('win_bowl_first', 52)} प्रतिशत मैच जीत चुकी है।", "seg_pitch"),
         ]
 
-    # 4. CREX POINTS TABLE, SERIES LEADERS & ICC RANKINGS (3 non-repeating angles)
+    # 4. CREX POINTS TABLE, SERIES LEADERS & ICC RANKINGS
     if topic == "points_series":
         pt = state.points_table or []
         sl = state.series_leaders or []
@@ -606,22 +617,19 @@ def build_next_segment(
             odi_top = ", ".join(f"#{x.get('rank')} {x.get('team')} ({x.get('rating')})" for x in rk.get("odi_teams", [])[:3])
             t20_top = ", ".join(f"#{x.get('rank')} {x.get('team')} ({x.get('rating')})" for x in rk.get("t20_teams", [])[:3])
             return [
-                ("host", f"अंतरराष्ट्रीय क्रिकेट की आईसीसी रैंकिंग पर नज़र डालें तो वनडे में {odi_top or 'IND शीर्ष पर'} और टी20 में {t20_top or 'ENG और IND'} के बीच जबरदस्त होड़ चल रही है।", "seg_points"),
-                ("expert", "दिलचस्प बात यह है कि अब फ्रेंचाइज़ी लीग्स में चमकने वाले खिलाड़ी सीधे नेशनल टीम में जगह बना रहे हैं, जिससे अंतरराष्ट्रीय रैंकिंग में शीर्ष चार टीमों का अंतर बेहद कम रह गया है।", "seg_points"),
+                ("expert", f"अंतरराष्ट्रीय क्रिकेट की आईसीसी रैंकिंग में वनडे में {odi_top or 'IND शीर्ष पर'} और टी20 में {t20_top or 'ENG और IND'} के बीच जबरदस्त होड़ है, और आजकल युवा खिलाड़ी इन्हीं मुकाबलों से सीधे नेशनल टीम में जगह बना रहे हैं।", "seg_points"),
             ]
         if angle == "series_caps":
             leader_txt = ", ".join(f"{x.get('category', '')}: {x.get('player', '').title()} ({x.get('value', '')})" for x in sl[:3])
             return [
-                ("host", f"टूर्नामेंट के प्रमुख स्टैट्स लीडर्स की सूची में इस वक्त {leader_txt or f'{striker} सबसे आगे'} छाए हुए हैं।", "seg_points"),
-                ("expert", "जब लीडरबोर्ड के टॉप बल्लेबाज़ और सबसे ज़्यादा छक्के लगाने वाले खिलाड़ी लय में हों, तो विपक्षी गेंदबाज़ उनके खिलाफ खास डेटा प्लान तैयार करके मैदान में उतरते हैं।", "seg_points"),
+                ("expert", f"टूर्नामेंट के प्रमुख स्टैट्स लीडर्स की सूची में इस वक्त {leader_txt or f'{striker} सबसे आगे'} छाए हुए हैं। जब लीडरबोर्ड के शीर्ष खिलाड़ी लय में हों, तो विपक्षी गेंदबाज़ उनके खिलाफ खास रणनीति बनाकर उतरते हैं।", "seg_points"),
             ]
         top_teams = ", ".join(f"{r.get('team', '')} ({r.get('pts', 0)} अंक)" for r in pt[:3])
         return [
-            ("expert", f"टूर्नामेंट के पॉइंट्स टेबल की दौड़ अभी से रोमांचक हो चली है। शीर्ष पर {top_teams or team} के बीच कड़ा मुकाबला दिख रहा है, और ऐसे में सिर्फ जीत नहीं बल्कि नेट रन रेट भी आखिरी हफ़्ते में सेमीफाइनल का टिकट तय करता है।", "seg_points"),
-            ("host", "बिल्कुल ठीक कहा! हर एक ओवर में बचाया गया चार-पांच रन महीने के अंत में बहुत बड़ी बढ़त दिलाता है।", "seg_points"),
+            ("expert", f"टूर्नामेंट के पॉइंट्स टेबल में शीर्ष पर {top_teams or team} के बीच कड़ा मुकाबला चल रहा है। ऐसे में हर मैच में सिर्फ जीत ही नहीं, बल्कि नेट रन रेट भी सेमीफाइनल और फाइनल की राह तय करता है।", "seg_points"),
         ]
 
-    # 5. CREX FORM, H2H & FAN POLL (3 non-repeating angles)
+    # 5. CREX FORM, H2H & FAN POLL
     if topic == "form_h2h_poll":
         tf = state.team_form or {}
         fp = state.fan_poll or {}
@@ -629,55 +637,33 @@ def build_next_segment(
         angle = deck.pick("form_angle", ["streak", "h2h_recap", "fan_poll"])
         if angle == "fan_poll":
             return [
-                ("host", f"लाइव फैन पोल पर अभी तक {fp.get('total_votes', 207850):,} से अधिक क्रिकेट प्रेमी अपनी भविष्यवाणी दर्ज कर चुके हैं!", "seg_form"),
-                ("expert", f"पोल में {team} को {fp.get('batting_pct', 50)} प्रतिशत और {bowl_team} को {fp.get('bowling_pct', 50)} प्रतिशत समर्थन मिला है। लेकिन एक अच्छा ओवर या एक कैच इस पूरे पोल का मीटर उलट सकता है।", "seg_form"),
+                ("expert", f"लाइव फैन पोल पर अब तक {fp.get('total_votes', 207850):,} से अधिक क्रिकेट प्रेमी वोट दर्ज कर चुके हैं, जहाँ {team} को {fp.get('batting_pct', 50)} प्रतिशत और {bowl_team} को {fp.get('bowling_pct', 50)} प्रतिशत समर्थन मिला है — हालांकि एक बड़ा ओवर इस पूरे समीकरण को पलट सकता है।", "seg_form"),
             ]
         if angle == "h2h_recap" and h2h:
             last_h2h = h2h[0]
             return [
-                ("host", f"इन दोनों टीमों के पिछले आमने-सामने रिकॉर्ड हमेशा कांटे के रहे हैं — पिछली भिड़ंत में {last_h2h.get('match', '')} के दौरान {last_h2h.get('result', '')} हुआ था।", "seg_form"),
-                ("expert", "पुरानी राइवलरी जब भी मैदान पर उतरती है, तो खिलाड़ी सामान्य से दस प्रतिशत अतिरिक्त जोश दिखाते हैं और छोटे मोमेंट्स बड़े बन जाते हैं।", "seg_form"),
+                ("expert", f"इन दोनों टीमों के पिछले आमने-सामने रिकॉर्ड हमेशा कांटे के रहे हैं — पिछली भिड़ंत में {last_h2h.get('match', '')} के दौरान {last_h2h.get('result', '')} रहा था, और आज भी वही पुरानी प्रतिद्वंद्विता मैदान पर साफ दिख रही है।", "seg_form"),
             ]
         bat_form = _spoken_form(tf.get("batting", ["W", "L"])[-5:])
         bowl_form = _spoken_form(tf.get("bowling", ["W", "W"])[-5:])
         return [
-            ("host", f"पिछले पांच मुकाबलों की फॉर्म पर नज़र डालें तो {team} का सफर {bat_form} और {bowl_team} का {bowl_form} रहा है।", "seg_form"),
-            ("expert", "मोमेंटम बहुत तेज़ी से बदलता है — लगातार जीत के बाद ड्रेसिंग रूम में निडरता आती है, जबकि हार के बाद कप्तान बेसिक्स पर लौटने की सलाह देते हैं।", "seg_form"),
+            ("expert", f"पिछले पांच मुकाबलों की फॉर्म पर नज़र डालें तो {team} का सफर {bat_form} और {bowl_team} का {bowl_form} रहा है। लगातार जीत से टीम में निडरता आती है, जबकि दबाव के क्षणों में बेसिक्स ही जीत दिलाते हैं।", "seg_form"),
         ]
 
-    # 6. CREX NEWS DESK (Zero-repeat)
+    # 6. CREX NEWS DESK
     if topic == "crex_news":
         news_list = get_news_items(limit=20)
         if news_list:
             picked = deck.pick("crex_news", news_list)
             raw_title = picked["title"]
-            # Strip CREX author/timestamp suffix like "KAUSHIK∙ 4 HRS AGO"
             headline = re.sub(r"\s+[A-Z][A-Za-z\s]*[•∙]\s*\d+\s+(?:HRS?|MINS?|DAYS?|WEEKS?)\s+AGO.*$", "", raw_title).strip()
             headline = headline or raw_title
-            bridge = deck.pick(
-                "news_bridge",
-                [
-                    f"क्रिकेट जगत में इस वक्त हर तरफ इस खबर की चर्चा है — {headline}. आज के दौर में खिलाड़ी एक तरफ लीग क्रिकेट खेलते हैं और साथ ही इंटरनेशनल रिकॉर्ड्स पर भी नज़र बनाए रखते हैं। ऐसी उपलब्धियां युवा खिलाड़ियों को भी प्रेरित करती हैं कि हर मैच को पूरी गंभीरता से लें।",
-                    f"जी हाँ, {headline} — यह अपडेट बताती है कि आधुनिक क्रिकेट कितनी तेज़ी से बदल रहा है। चाहे रिकॉर्ड्स टूटने की बात हो या टीम सिलेक्शन की रणनीति, हर टूर्नामेंट अगले बड़े इवेंट की तैयारी बन चुका है।",
-                    f"बिल्कुल, जब ऐसी बड़ी खबरें सामने आती हैं — जैसे {headline} — तो ड्रेसिंग रूम के माहौल और फैंस की उम्मीदों दोनों में नया रोमांच जुड़ जाता है।",
-                ],
-            )
-            outro = deck.pick(
-                "news_outro",
-                [
-                    f"वाकई बड़ी खबर है! चलिए इसी ऊर्जा के साथ वापस {venue} की पिच पर लौटते हैं जहाँ {striker} क्रीज़ पर डटे हुए हैं।",
-                    f"बिल्कुल सही विश्लेषण! खैर अब निगाहें फिर से मैदान पर — {bowler} अपने अगले ओवर की तैयारी कर रहे हैं।",
-                    f"जी हाँ, क्रिकेट की दुनिया लगातार घूम रही है — और उधर {team} की नज़रें अगले कुछ ओवरों में स्कोर तेज़ी से बढ़ाने पर हैं।",
-                    f"बहुत बढ़िया अपडेट थी यह! चलिए अब क्रीज़ के एक्शन पर वापस आते हैं जहाँ {striker} और {non_striker} मौजूद हैं।",
-                ],
-            )
-            return [
-                ("host", f"मैच के बीच क्रिकेट न्यूज़ डेस्क से एक अहम अपडेट भी आ रही है — {headline}।", "seg_news"),
-                ("expert", bridge, "seg_news"),
-                ("host", outro, "seg_news"),
-            ]
+            if re.search(r"[\u0900-\u097F]", headline or ""):
+                return [
+                    ("expert", f"मैच के बीच क्रिकेट जगत से एक बड़ी अपडेट भी सामने आ रही है — {headline}। इस तरह की खबरें टूर्नामेंट के रोमांच को और बढ़ा देती हैं, लेकिन फिलहाल मैदान पर {striker} और {non_striker} पर सभी की निगाहें टिकी हैं।", "seg_news"),
+                ]
 
-    # 7. DB STORYTELLING (Varied narrator & multi-sentence delivery)
+    # 7. DB STORYTELLING (Solo Expert narrative)
     if topic == "db_story":
         raw_stories = get_all_stories()
         series_low = (state.series_name or "").lower()
@@ -688,34 +674,11 @@ def build_next_segment(
         ] or [s for s in raw_stories if (s.get("match_context") or "general") == "general"]
         if all_stories:
             st = deck.pick("db_story", all_stories)
-            opener = deck.pick(
-                "story_opener",
-                [
-                    f"यार {venue} की इस फ्लडलाइट्स और भीड़ को देखकर मुझे एक कमाल का किस्सा याद आ रहा है...",
-                    "सुनिए ज़रा... मैं आपको क्रिकेट की एक ऐसी मज़ेदार बात बताता हूँ जो बहुत कम लोग जानते होंगे!",
-                    "वैसे इस मुकाबले के बीच मुझे ड्रेसिंग रूम का एक शानदार किस्सा याद आ गया...",
-                ],
-            )
-            # Alternate between extended Expert storytelling, multi-turn, and Host lead
-            if random.random() < 0.5:
-                s_outro = deck.pick(
-                    "story_outro",
-                    [
-                        f"हाहा, यही तो इस खेल को बाकी खेलों से अलग बनाता है! खैर नज़रें फिर से {bowler} पर जो अगले ओवर के लिए तैयार हैं।",
-                        f"क्या कमाल का किस्सा था! अब देखते हैं क्रीज़ पर {striker} यहाँ से कैसी पारी खेलते हैं।",
-                        f"बिल्कुल लाजवाब बात कही आपने! खैर मैदान पर मुकाबला फिर गरमाता जा रहा है।",
-                    ],
-                )
-                return [
-                    ("host", opener, "seg_story"),
-                    ("expert", f"{st['host_line']} और मज़े की बात यह है कि {st['expert_line']}", "seg_story"),
-                    ("host", s_outro, "seg_story"),
-                ]
-            return [
-                ("host", st["host_line"], "seg_story"),
-                ("expert", st["expert_line"], "seg_story"),
-            ]
+            expert_part = re.sub(r"^(?:बिल्कुल सही[!।,\s]*|जी हाँ[!।,\s]*|बिल्कुल[!।,\s]*|हाहा[,!\s]*|अरे बिल्कुल[!।,\s]*)", "", str(st.get("expert_line") or "")).strip()
+            combined = f"{st.get('host_line', '').strip()} {expert_part}".strip()
+            if combined:
+                return [("expert", combined, "seg_story")]
 
     # 8. RULES, BIOMECHANICS & CRAFT DEEP-DIVE
     rule_id, rule_turns = deck.pick("rules_craft", RULES_AND_CRAFT_LIBRARY)
-    return [(spk, txt, f"seg_rule:{rule_id}") for spk, txt in rule_turns]
+    return [("expert", txt, f"seg_rule:{rule_id}") for _, txt in rule_turns]

@@ -1,0 +1,10 @@
+[0:a]aresample=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a0];
+anullsrc=r=48000:cl=stereo:d=0.280[s0];
+[1:a]aresample=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a1];
+anullsrc=r=48000:cl=stereo:d=0.280[s1];
+[2:a]aresample=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a2];
+anullsrc=r=48000:cl=stereo:d=0.280[s2];
+[3:a]aresample=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a3];
+anullsrc=r=48000:cl=stereo:d=0.280[s3];
+[4:a]aresample=48000,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a4];
+[a0][s0][a1][s1][a2][s2][a3][s3][a4]concat=n=9:v=0:a=1,highpass=f=85,lowpass=f=13500,equalizer=f=350:t=o:w=1.2:g=-1.0,acompressor=threshold=-18dB:ratio=1.7:attack=18:release=130,loudnorm=I=-15:TP=-1.5:LRA=7[aout]

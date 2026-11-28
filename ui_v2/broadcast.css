@@ -3377,4 +3377,4 @@ body.show-controls .quick-controls {
   cursor: pointer;
 }
 
-.qc-btn:hover { border-color: var(--gold-400); color: var(--gold-400); 
+.qc-btn:hover { border-color: var(--gold-400); color: var(--gold-400); }
